@@ -1,0 +1,20 @@
+{% load sekizai_tags thumbnail %}
+
+<div class="portfolio-slides" style="position: relative; width: 400px; height: 300;">
+    {% for image in images %}
+    <img src="{% thumbnail image.src 400x300 %}"
+         alt="{{image.alt}}"
+         style="position: absolute; top:0px; left:0px; display: none; z-index: 0; opacity: 1;"/>
+    {% endfor %}
+</div>
+
+<script type="text/javascript">
+$('.portfolio-slides').cycle({
+    fx: 'fade' // choose your transition type, ex: fade, scrollUp, shuffle, etc...
+});
+</script>
+
+{% addtoblock "js" %}
+<script type="text/javascript" src="{{STATIC_URL}}gallery/js/jquery-cycle.js"></script>
+{% endaddtoblock %}
+

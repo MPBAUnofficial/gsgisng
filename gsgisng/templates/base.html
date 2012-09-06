@@ -1,0 +1,72 @@
+{% load sekizai_tags cms_tags %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>
+      {% block title %}{% page_attribute "page_title" %}{% endblock %}
+    </title>
+    <link rel="stylesheet" href="{{STATIC_URL}}css/base.css" type="text/css"/>
+    <link rel="stylesheet" href="{{STATIC_URL}}css/colors/enviro.css" type="text/css"/>
+    {% render_block "css" %}
+    <script type="text/javascript" src="{{STATIC_URL}}js/jquery-180.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/init.js"></script>
+    {% render_block "js" %}
+  </head>
+  <body>
+    {% cms_toolbar %}
+    <!-- Header -->
+    <div id="wrapper">
+      <!-- Header -->
+      <div id="header">
+        <div class="logo">
+          {% placeholder "application_logo" or %}
+            {% show_placeholder "application_logo" HOME_PAGE_ID %}
+          {% endplaceholder %}
+        </div>
+        <div class="social">
+          {% placeholder "partner_logos" or %}
+            {% show_placeholder "partner_logos" HOME_PAGE_ID %}
+          {% endplaceholder %}
+        </div>
+      </div>
+      <!-- End Header -->
+
+      {% include "partials/topbar.html" %}
+
+      <!-- Container -->
+      <div id="container">
+        {% if login_form.errors %}
+        {{ login_form.non_field_errors }}
+        {% endif %}
+        <h2 class="intro">
+          {% placeholder "intro" or %}
+            {% show_placeholder "intro" HOME_PAGE_ID %}
+          {% endplaceholder %}
+        </h2>
+        <div class="e-showcase-target" id="target">
+          <div class="e-showcase-block active" id="block_3" style="display: block;">
+            <div class="inner">
+              {% block page_content %}
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+        <div class="clear"></div>
+      </div>
+      <!-- End Container -->
+
+      <!-- Begin Footer -->
+      <div id="menubottom" class="menu"> 
+        <br style="clear: left" />
+      </div>
+      {% placeholder "footer" or %}
+        {% show_placeholder "footer" HOME_PAGE_ID %}
+      {% endplaceholder %}
+      <!-- <div class="copyright"> Copyright logo </div> -->
+      <!-- End Footer -->
+
+    </div>
+  </body>
+</html>
+

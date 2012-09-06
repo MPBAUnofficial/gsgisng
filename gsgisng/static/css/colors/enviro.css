@@ -1,0 +1,112 @@
+a,
+h1, h2, h3, h4, h5, h6, 
+.sidebar #twitter ul li a, 
+.sidebar #twitter .username a, 
+.notes,.notice,.success,.error, 
+#comments span.reply-link a:hover, 
+.highlight,
+.date-hi,
+.menu ul li a.selected,
+.menu ul li a:hover, 
+.menu ul li ul li a:hover,.menu ul li a.current, 
+.menu ul li.current_page_item a, 
+.menu ul li.current_page_ancestor a, 
+.menu ul li.current-post-ancestor a, 
+.menu ul li.current-menu-item a, 
+.menu ul li.current-menu-ancestor a, 
+.menu ul li.current-menu-parent a,
+ul.filter li a.active h5, 
+ul.filter li a:hover h5,
+.sidebox ul li a:hover,
+.page-navi ul li a,
+ul.tabs li a:hover,
+h4.trigger  {
+	color: #3399FF;
+}
+
+.menu ul li a.active {
+	color: #085DAD;
+}
+
+h2.intro {
+	color: #989898;
+}
+
+h4.list{
+	color: #3399FF;
+	margin-top: 10px;
+}
+
+p {
+	color: #8b8b8b;
+}
+
+.menu ul li a.active {
+	background: #ABE687; 
+}
+
+.slide-out-div h3 {
+       color: white;
+}
+
+.menu ul li a.active, 
+.menu ul li a.selected, 
+.menu ul li a:hover, 
+.menu ul li ul li a:hover,
+.menu ul li a.current, 
+.menu ul li.current_page_item a, 
+.menu ul li.current_page_ancestor a, 
+.menu ul li.current-post-ancestor a, 
+.menu ul li.current-menu-item a, 
+.menu ul li.current-menu-ancestor a, 
+.menu ul li.current-menu-parent a,
+.menu ul li.current-menu-ancestor a,
+.menu ul li.current-menu-item ul li a:hover {
+	background-color: #FFF;
+}
+
+.highlight {
+	border-bottom: 1px dotted #ABE687;
+}
+
+.highlight2 {
+	border-bottom: 1px dotted #ABE687;
+}
+
+ul.tabs li.active a {
+	border: 1px solid #ABE687;
+	background-color: #8CC739;
+}
+
+.menu, .menu ul li a, .menu ul li ul {
+	background-color: #085DAD;
+	/*font-weight: bold;*/
+}
+
+a.button,
+#contact-form input#submit-button, 
+#comment-form input#submit-button,
+#login-form input.button {
+	background-color: #8CC739;
+	color: #FFF;
+}
+
+#signin_menu a.login_button {
+	background-color: #8CC739;
+	color: #FFF;
+}
+
+
+.blog-content .post-content .post-info,
+.page-navi ul li a:hover, 
+.page-navi ul li a.current {
+	background-color: #8CC739;
+}
+
+#footer {
+	background-color: #085DAD;
+}
+
+.important {
+    float: right;
+}

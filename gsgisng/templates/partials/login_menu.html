@@ -1,0 +1,49 @@
+<li>
+    <a href="login" class="signin">
+        <span>
+        {% if user.is_authenticated %}
+            <span style="text-transform:lowercase;">{{ user.email }}</span>
+        {% else %}
+            Sign in
+        {% endif %}
+        </span>
+    </a>
+    <fieldset id="signin_menu">
+    {% if user.is_authenticated %}
+        <div>
+        {% if user.userprofile.avatar %}
+            <img class="userprofile_icon" src="{# {{ user.userprofile.avatar.url }} #}" />
+        {% else %}
+            <img class="userprofile_icon" src="{# {{ STATIC_PREFIX }}inail/images/login/loginuser_icon.png #}" />
+        {% endif %}
+        </div>
+        <div style="margin-bottom:5px;" >
+            {# {{ user.get_full_name }} #}
+        </div>
+        <div style="margin-bottom:5px;">
+            {# {{ user.email }} #}
+        </div>
+        <br/><br/><br/>
+        <div style="float: left;">
+            <a class="login_button"  href="{# {% url auth_logout_redit_home %}#}">Logout</a>
+            <a class="login_button" href="{#{% url auth_password_change %}#}">Cambia password</a>
+        </div>
+    {% else %}
+        <form id="login-form" action="{#{% url django_site.site.setup.views.login %}#}" method="post">
+            {#{{ login_form.as_p }}#}
+            <p>
+                <label for="id_username"> Nome utente : </label>
+                <input id="id_username" type="text" name="username" maxlength="30">
+            </p>
+            <p>
+                <label for="id_password"> Nome utente : </label>
+                <input id="id_password" type="text" name="password" maxlength="30">
+            </p>
+            {% csrf_token %}
+            <p>
+                <input class="button launch" type="submit" value="Sign In" /> </p> </form>
+            </p>
+        </form>
+    {% endif %}
+    </fieldset>
+</li>

@@ -1,0 +1,22 @@
+# Django 1.4 
+django>=1.4.1
+
+# django-registration>=0.8
+
+# C extensions
+# please consider installing those sistem-wide with "apt-get install python-imaging python-lxml"
+# PIL
+# lxml
+
+# South : migration support
+south
+
+# CMS itself
+django-cms
+
+# CMS plugins
+easy-thumbnails >= 1.0
+-e git://github.com/stefanfoulis/django-filer.git@develop#egg=filer
+-e git://github.com/stefanfoulis/cmsplugin-filer.git@develop#egg=cmsplugin-filer
+# -e git://github.com/centralniak/cmsplugin_gallery.git#egg=cmsplugin_gallery
+-e git://github.com/shagi/cmsplugin_gallery_filer.git#egg=cmsplugin_gallery
