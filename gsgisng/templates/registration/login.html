@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load url from future %}
+{% load i18n %}
+
+{% block page_content %}
+<form method="post" action=".">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><a href="{% url "auth_password_reset" %}">{% trans "Forgot your password?" %}</a></p>
+    <input type="submit" value="{% trans 'Login' %}" />
+</form>
+{% endblock %}

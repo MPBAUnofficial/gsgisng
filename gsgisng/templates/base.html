@@ -36,9 +36,6 @@
 
       <!-- Container -->
       <div id="container">
-        {% if login_form.errors %}
-        {{ login_form.non_field_errors }}
-        {% endif %}
         <h2 class="intro">
           {% placeholder "intro" or %}
             {% show_placeholder "intro" HOME_PAGE_ID %}

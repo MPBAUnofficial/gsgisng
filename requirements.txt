@@ -1,7 +1,7 @@
 # Django 1.4 
 django>=1.4.1
 
-# django-registration>=0.8
+django-registration>=0.8
 
 # C extensions
 # please consider installing those sistem-wide with "apt-get install python-imaging python-lxml"
