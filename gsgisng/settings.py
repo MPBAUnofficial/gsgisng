@@ -112,6 +112,14 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'gsgisng.context_processors.home_page_id',
 )
 
+THUMBNAIL_PROCESSORS = (
+    'easy_thumbnails.processors.colorspace',
+    'easy_thumbnails.processors.autocrop',
+    #'easy_thumbnails.processors.scale_and_crop',
+    'filer.thumbnail_processors.scale_and_crop_with_subject_location',
+    'easy_thumbnails.processors.filters',
+)
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -162,6 +170,7 @@ INSTALLED_APPS = (
 
     'easy_thumbnails',
     'filer',
+    'cmsplugin_filer_image',
     'cmsplugin_gallery',
     # Page versioning
 #    'reversion',
