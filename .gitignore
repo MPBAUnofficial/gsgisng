@@ -2,6 +2,7 @@
 db/*
 media/*
 static/*
+gsgisng/settings.py
 .venv
 *#
 *~
