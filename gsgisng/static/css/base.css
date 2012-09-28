@@ -131,7 +131,8 @@ body {
 #header {
 	width: 920px;
 	margin: 0 auto;
-	padding: 35px 0;
+	padding: 20px 0;
+  overflow: auto;
 }
 .logo {
 	float: left;
