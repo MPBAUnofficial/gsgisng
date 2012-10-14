@@ -166,6 +166,9 @@ INSTALLED_APPS = (
     'registration',
     # Page versioning
 #    'reversion',
+
+    'pg_fuzzysearch',
+    'profiles'
 )
 
 # A sample logging configuration. The only tangible logging
