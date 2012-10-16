@@ -1,0 +1,8 @@
+{% load thumbnail %}
+<ul>
+  {% for image in images %}
+  <li>
+    <img src="{% thumbnail image.src 0x48 crop %}" alt="{{image.alt}}"/>
+  </li>
+  {% endfor %}
+</ul>
