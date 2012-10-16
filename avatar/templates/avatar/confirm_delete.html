@@ -1,0 +1,23 @@
+{% extends "avatar/base.html" %}
+{% load i18n %}
+{% load sekizai_tags %}
+
+{% block content %}
+{% addtoblock "css" %}
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}avatar/forms.css" />
+{% endaddtoblock %}
+
+    <p>{% trans "Please select the avatars that you would like to delete." %}</p>
+    {% if not avatars %}
+        {% url avatar_change as avatar_change_url %}
+        <p>{% blocktrans %}You have no avatars to delete. Please <a href="{{ avatar_change_url }}">upload one</a> now.{% endblocktrans %}</p>
+    {% else %}
+        <form class="avatars-form" method="POST" action="{% url avatar_delete %}">
+            {% csrf_token %}
+            <table>
+                {{ delete_avatar_form.as_table }}
+                <tr><td colspan="2"><input type="submit" value="{% trans "Delete These" %}" /></td></tr>
+            </table>
+        </form>
+    {% endif %}
+{% endblock %}

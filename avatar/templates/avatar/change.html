@@ -1,0 +1,31 @@
+{% extends "avatar/base.html" %}
+{% load i18n avatar_tags %}
+{% load sekizai_tags %}
+
+{% block content %}
+    {% addtoblock "css" %}
+       <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}avatar/forms.css" />
+    {% endaddtoblock %}
+
+    <div style="clear: both;">
+      <h2>{% trans "Your current avatar" %}</h2>
+      {% avatar user %}
+    </div>
+    <h2 style="clear: both;">{% trans "Select an uploaded avatar" %}</h2>
+    {% if not avatars %}
+        <p>{% trans "You haven't uploaded an avatar yet. Please upload one now." %}</p>
+    {% else %}
+        <form class="avatars-form" method="POST" action="{% url avatar_change %}">
+            {% csrf_token %}
+            <table>
+                {{ primary_avatar_form.as_table }}
+                <tr><td colspan="2"><input type="submit" value="{% trans "Choose new Default" %}" /></td></tr>
+            </table>
+        </form>
+    <h2 style="clear: both;">{% trans "Upload a new avatar" %}</h2>
+    {% endif %}
+    <form enctype="multipart/form-data" method="POST" action="{% url avatar_add %}">
+        {{ upload_avatar_form.as_p }}
+        <p>{% csrf_token %}<input type="submit" value="{% trans "Upload New Image" %}" /></p>
+    </form>
+{% endblock %}

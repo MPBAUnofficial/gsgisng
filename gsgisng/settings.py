@@ -168,7 +168,8 @@ INSTALLED_APPS = (
 #    'reversion',
 
     'pg_fuzzysearch',
-    'profiles'
+    'profiles',
+    'avatar',
 )
 
 # A sample logging configuration. The only tangible logging

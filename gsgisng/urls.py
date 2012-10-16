@@ -21,6 +21,7 @@ urlpatterns = patterns('',
          'backend': 'profiles.regbackend.RegBackend'},
         name='registration_register'),
     url(r'^accounts/', include('registration.backends.default.urls')),
+    url(r'^avatar/', include('avatar.urls')),
     # Django cms
     url(r'^', include('cms.urls')),
 )

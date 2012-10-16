@@ -1,5 +1,6 @@
 {% load url from future %}
 {% load i18n %}
+{% load avatar_tags %}
 
 <li>
     <a href="login" class="signin">
@@ -15,20 +16,20 @@
     {% if user.is_authenticated %}
     <fieldset id="signin_menu">
         <div>
-        {% if user.userprofile.avatar %}
-            <img class="userprofile_icon" src="{# {{ user.userprofile.avatar.url }} #}" />
-        {% else %}
-            <img class="userprofile_icon" src="{# {{ STATIC_PREFIX }}inail/images/login/loginuser_icon.png #}" />
-        {% endif %}
+          {% avatar user %}
         </div>
-        <div style="margin-bottom:5px;" >
+        <div>
+        <a href="{% url "avatar_change" %}">Change your avatar</a>
+        </div>
+<!--        <div style="margin-bottom:5px;" >
             {# {{ user.get_full_name }} #}
         </div>
         <div style="margin-bottom:5px;">
             {# {{ user.email }} #}
         </div>
         <br/><br/><br/>
-        <div style="float: left;">
+-->
+        <div>
             <a class="login_button"  href="{% url "auth_logout" %}">Logout</a>
             <a class="login_button"  href="{% url "auth_password_change" %}">{% trans "Change password" %}</a>
         </div>

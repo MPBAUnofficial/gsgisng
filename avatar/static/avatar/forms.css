@@ -1,0 +1,10 @@
+form.avatars-form table {
+    width: auto;
+}
+form.avatars-form table img {
+    float: none;
+}
+form.avatars-form table li {
+    list-style-type: none;
+    display: inline;
+}
