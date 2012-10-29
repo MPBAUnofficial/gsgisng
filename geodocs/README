@@ -1,0 +1,157 @@
+Geodocs
+=======
+
+A django app to handle georeferenced images and documents.
+
+Installation
+------------
+
+Does not require geodjango to be configured.
+
+### Requirements
+
+* Postgresql with Postgis in the backend
+* django 1.4
+* 'profiles' app (found in gsgisng) (in your INSTALLED_APPS)
+* django-tojson and PIL: simply run
+      pip install -r geodocs/requirements.txt
+
+### Install
+* add 'geodocs' to your installed apps in settings
+* run syncdb
+* include geodocs.urls from your urls
+    url(r'^geodocs', include('geodocs.urls'))
+* set up a layer in eyour geoserver/whatever that takes as source
+  the postgres geodocs_point table in your database
+
+Configuration
+-------------
+
+You may set following constants in your django settings module:
+
+* **GEODOCS_SRID** SRID to be used (as the integer EPSG number). 
+  IMPORTANT: set this before running syncdb, or it will fail. If you change it, you will have to manually operate on your db to handle this.
+* **GEODOCS_NO_CSRF_PROTECTION**  boolean, default False. if True, geodocs will ignore CSRF protection even on POST requests. Only for testing, really.
+
+Usage
+-----
+
+HTTP endpoints will be created:  (do not forget trailing slashes)
+
+* http://.../new/
+  (POST only): create new point with associated pictures.
+  expects a multipart/form-data payload with the following fields:
+
+  **degree**
+    (integer) number from 1 to 5, representing the degree
+    for the new point
+
+  **address**
+    (text) the address
+
+  **lon**
+    (float) longitude
+
+  **lat**
+    (float) latitude
+
+  **area**
+    (integer) (optional) id of the corresponding geographic area
+
+  **images-TOTAL_FORMS**
+    (integer) number of images
+
+  **images-INITIAL_FORMS**
+    (integer) just always write 0
+
+  **images-MAX_NUM_FORMS**
+    just always write empty string
+
+  **images-#-image**
+    (binary images) where # is an index from 0 to
+    images-TOTAL_FORMS-1, images related to the point
+
+  **docs-TOTAL_FORMS**
+    (integer) number of documents
+
+  **docs-INITIAL_FORMS**
+    (integer) just always write 0
+
+  **docs-MAX_NUM_FORM**
+    just always write empty string
+
+  **docs-#-doc**
+    (binary files) where # is an index from 0 to
+    docs-TOTAL_FORMS-1, documents related to the point
+
+  On success, 200 code is returned. The payload will be
+  JSON of the shape:
+
+      {
+        "success": true,
+        "pk": 2
+      }
+
+  Where "pk" field is the primary key of the newly created object
+
+  On request error, 400 code is returned. Reading the JSON response
+  should help in finding out what the error was:
+
+      {
+        "success": false,
+        "error_at": <"point" | "images" | "docs">,
+        "errors": <django form errors>
+      }
+
+* http://.../getinfo/<pk>/
+
+  Where <pk> is the primary key of the queried point.
+  Note that it can be called "id" in database
+  (and hence in geoserver's responses)
+
+  On success, 200 is returned with a JSON of the shape:
+
+      {
+        "success": true,
+        "pk": "1", 
+        "data": {
+          "pk": 1, 
+          "lon": 36.0,
+          "lat": 11.0, 
+          "degree": 2, 
+          "address": "via Sommarive, 17, 38121 Trento", 
+          "area": <area>, 
+          "images": [
+            "/media/geodocs/images/image_5.jpeg"
+          ], 
+          "docs": [
+            "/media/geodocs/documents/AAAAA_4"
+          ], 
+        },
+      }
+
+  Where <area> can be
+
+      null
+
+  or, if the area was set,
+
+      {
+        "pk": 1, 
+        "code": "TN", 
+        "name": "Provincia autonoma di Trento"
+      }
+
+* http://.../delete/<pk>/
+
+  (POST only) Deletes the specified point (and all related images and docs)
+
+  On success, returns 200 OK and {"success": true}
+
+  On failure (specified point does not exist), returns 404 and
+  {"success": false}
+
+
+Authors
+=======
+Written by Davide Kirchner

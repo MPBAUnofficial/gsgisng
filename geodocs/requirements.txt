@@ -1,0 +1,2 @@
+PIL # required by django ImageField
+git+https://github.com/davidek/django-tojson.git
