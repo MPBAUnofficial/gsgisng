@@ -1,0 +1,122 @@
+Shp_uploader
+=======
+
+A django app to handle the uploading of ShapeFile and styles.
+
+Installation
+------------
+### Requirements
+
+* Postgresql with Postgis in the backend
+* django 1.4
+* django-tojson
+* Gdal libraries with python bindings
+
+### Install
+* add 'shp_uploader' to your installed apps in settings
+* run syncdb
+* include shp_uploader.urls from your urls
+    url(r'^shp_uploader', include('shp_uploader.urls'))
+
+Configuration
+-------------
+
+You may set following constants in your django settings module:
+
+* **SCHEMA_USER_UPLOADS** Name of the postgres schema that should be created to
+                          storing the layers
+* **WORKSPACE_USER_UPLOADS** Name of the geoserver workspace that should be
+                             created and used by the app
+* **DATASTORE_USER_UPLOADS** Name of the geoserver datastore that should be
+                             created and used by the app
+* **GEOSERVER_URL** Url of the geoserver (http://host:port/)
+                    NB put http:// in the url
+* **GEOSERVER_USER** Username for the geoserver
+* **GEOSERVER_PASSWORD** Password for the geoserver
+* **MAX_LAYER_UPLOADS** Max number of layers that a user can upload
+* **MAX_STYLE_UPLOADS** Max number of styles that a user can upload
+
+Usage
+-----
+
+HTTP endpoints will be created:
+
+* http://.../upload_shape/
+  (POST only): upload a new shape file. It is stored as a postgis layer, and
+               then indexed in the geoserver
+
+  On success, 200 code is returned. The payload will be
+  JSON of the shape:
+
+      {
+        "success": true
+      }
+
+  On request error, 400 code is returned. Reading the JSON response
+  should help in finding out what the error was:
+
+      {
+        "success": false,
+        "errors": <list of error message>
+      }
+
+* http://.../lists_shapes/
+  Returns the list of shapes of the user.
+
+  On success, 200 is returned with a JSON of the shape:
+
+      {
+        "success": true,
+        "layers": <list of the layers>
+      }
+
+* http://.../delete_shape/<pk>/
+  Deletes the specified shape.
+
+  On success, returns 200 OK and {"success": true}
+
+  On failure (specified shape does not exist), returns 404 and
+  {
+    "success": false,
+    "message": error_message
+  }
+
+* http://.../upload_style/
+  (POST only): upload a new style file. It is stored in the db and indexed in
+               the geoserver
+
+  On success, 200 code is returned. The payload will be
+  JSON of the shape:
+
+      {
+        "success": true
+      }
+
+  On request error, 400 code is returned. Reading the JSON response
+  should help in finding out what the error was:
+
+      {
+        "success": false,
+        "errors": <list of error message>
+      }
+
+* http://.../lists_styles/
+  Returns the list of shapes of the user.
+
+  On success, 200 is returned with a JSON of the shape:
+
+      {
+        "success": true,
+        "styles": <list of the styles>
+      }
+
+* http://.../delete_style/<pk>/
+  Deletes the specified style.
+
+  On success, returns 200 OK and {"success": true}
+
+  On failure (specified style does not exist), returns 404 and
+  {
+    "success": false,
+    "message": error_message
+  }
