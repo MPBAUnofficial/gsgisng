@@ -47,6 +47,7 @@ def _upload2pg(dir, epsg_code):
         '.format(db_conf['HOST'],db_conf['USER'],db_conf['NAME'],
                  db_conf['PASSWORD'],schema),
         '-a_srs', 'EPSG:'+str(epsg_code),
+        '-lco', 'PRECISION=NO',
         dir]
     try:
         return ogr2ogr.main(args)
@@ -151,7 +152,6 @@ def upload_shp(request):
                 return {'success': False,
                         'errors': [msg]}, {'cls': HttpResponseBadRequest}
     else:
-        _delete_layer_postgis(shp_uploader_settings.SCHEMA_USER_UPLOADS, layer_id)
         return {'success': False,
                 'errors': form.errors}, {'cls': HttpResponseBadRequest}
 
