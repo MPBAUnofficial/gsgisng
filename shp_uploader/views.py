@@ -144,7 +144,7 @@ def upload_shp(request):
                     workspace = shp_uploader_settings.WORKSPACE_USER_UPLOADS,
                     datastore = shp_uploader_settings.DATASTORE_USER_UPLOADS)
                 ul.save()
-                return {'success': True}
+                return {'success': True}, {'mimetype': 'text/html'}
             else:
                 _delete_layer_postgis(shp_uploader_settings.SCHEMA_USER_UPLOADS, layer_id)
                 msg = "Failed to index the layer on geoserver."

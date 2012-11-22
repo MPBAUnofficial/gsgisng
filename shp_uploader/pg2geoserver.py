@@ -102,7 +102,7 @@ class Pg2Geoserver(object):
         headers = {'Content-type' : 'text/xml'}
         url = urlparse.urljoin(self.geoserver_url,
                                os.path.join("/geoserver/rest/layers/",
-                                            layer_name)
+                                            urllib.quote_plus(layer_name))
                                )
         req = urllib2.Request(url, headers=headers)
         req.get_method = lambda: 'DELETE'
@@ -127,7 +127,7 @@ class Pg2Geoserver(object):
         data = xml
         url = urlparse.urljoin(self.geoserver_url,
                                os.path.join("/geoserver/rest/styles/",
-                                            style_name)
+                                            urllib.quote_plus(style_name))
                                )
         req = urllib2.Request(url, data, headers)
         req.get_method = lambda: 'PUT'
@@ -144,7 +144,7 @@ class Pg2Geoserver(object):
         headers = {'Content-type' : 'text/xml'}
         url = urlparse.urljoin(self.geoserver_url,
                                os.path.join("/geoserver/rest/styles/",
-                                            style_name)
+                                            urllib.quote_plus(style_name))
                                )
         req = urllib2.Request(url, headers=headers)
         req.get_method = lambda: 'DELETE'
