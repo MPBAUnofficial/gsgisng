@@ -1,9 +1,12 @@
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.db import connection, transaction, utils
+from django.db.utils import DatabaseError
+from django.db import models
 from django.utils.translation import ugettext as _
 from shp_uploader import shp_uploader_settings
 from forms import ShapeForm, UserStyleForm
@@ -96,7 +99,7 @@ def _delete_layer_postgis(schema,layer_name):
     with transaction.commit_on_success():
         try:
             cursor.execute(query)
-        except django.db.utils.DatabaseError, e:
+        except DatabaseError, e:
             #if the layer could not be elimitade do nothing
             print e
     return
@@ -243,8 +246,16 @@ def delete_style(request, pk):
         return ({'success': False,
                  'message': 'Style {} does not exist'.format(pk)},
                 {'cls': HttpResponseNotFound})
+    try:
+        style.delete()
+    except models.ProtectedError, e:
+        msg = ("Cannot delete the style '{}' because "
+               "it is associate to the following layer: ").format(style.label)
+        msg += " ".join(["'"+s.label+"'" for s in style.userlayer_set.all()])
+        return ({'success': False,
+                 'message': msg},
+                {'cls': HttpResponseBadRequest})
     _remove_style_geoserver(style)
-    style.delete()
     return {'success': True}
 
 @login_required_json({'success': False,

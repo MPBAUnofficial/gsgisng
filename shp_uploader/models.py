@@ -62,12 +62,15 @@ class UserStyle(models.Model):
 class UserLayer(models.Model):
     user = models.ForeignKey(User)
     layer_name = models.CharField(max_length=200)
-    style = models.ForeignKey(UserStyle)
+    style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
     label = models.CharField(max_length=200)
     schema = models.CharField(max_length=200)
     workspace = models.CharField(max_length=200)
     datastore = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add = True)
+
+    def get_feature_type(self):
+        return self.style.feature_type
 
     def as_dict(self):
         return {'pk': self.pk,
