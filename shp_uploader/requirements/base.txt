@@ -1,0 +1,4 @@
+#gdal package with python bindings
+
+git+https://github.com/davidek/django-tojson.git
+
