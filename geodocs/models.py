@@ -5,22 +5,42 @@ from django.core.validators import \
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_syncdb
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+
+import hashlib
 
 from profiles.models import GeographicArea
 
 
-DEGREE_CHOICES = tuple((i, str(i)) for i in range(1, 6)) # 1 to 5
 
 _lon_validators = [MinVal(-360), MaxVal(360)] # quite large...
 _lat_validators = [MinVal(-90), MaxVal(90)]
 
 class Point(models.Model):
+    DEGREE_CHOICES = tuple((i, str(i)) for i in range(1, 6)) # 1 to 5
+    TOPICS = {
+        'water': 'Acqua',
+        'cultivation': 'Coltura',
+        'environment': 'Ambiente',
+        'soil': 'Suolo',
+    }
+    TOPIC_CHOICES = tuple(TOPICS.items())
+
     degree = models.IntegerField(_('degree'), choices=DEGREE_CHOICES)
+    topic = models.CharField(_('argomento'), choices=TOPIC_CHOICES,
+                             max_length=63)
     address = models.CharField(_('address'), max_length=511)
     lon = models.FloatField(_('longitude'), validators=_lon_validators)
     lat = models.FloatField(_('latitude'), validators=_lat_validators)
+    created = models.DateTimeField(_('creation time'), auto_now_add=True,
+                                   editable=False, blank=True)
+    user = models.ForeignKey(User, verbose_name=_('created by'),
+                             editable=False)
     area = models.ForeignKey(GeographicArea, null=True, blank=True,
                              verbose_name=_('geographic area'))
+
+
 
     def __unicode__(self):
         return u'Point {pk}'.format(pk=self.pk)
@@ -28,6 +48,10 @@ class Point(models.Model):
     def as_dict(self):
         return {'pk': self.pk,
                 'degree': self.degree,
+                'topic': Point.TOPICS[self.topic],
+                #'created': self.created.isoformat(' '),
+                'created': self.created.strftime('%Y-%m-%d %H:%M:%S'),
+                'user': self.user.username,
                 'address': self.address,
                 'lon': self.lon,
                 'lat': self.lat,
@@ -46,12 +70,40 @@ class Point(models.Model):
 class Image(models.Model):
     point = models.ForeignKey(Point)
     image = models.ImageField(_('image'), upload_to='geodocs/images')
+    digest = models.CharField(max_length=255, editable=False)
+
+    class Meta:
+        unique_together = (('point', 'digest'), )
+        verbose_name = _('image')
+
+    def clean(self):
+        if self.image:
+            d = hashlib.sha256()
+            for chunk in self.image.chunks():
+                d.update(chunk)
+            self.digest = d.hexdigest()
+        # if image is null, django will later raise the proper error
 
 class Document(models.Model):
     point = models.ForeignKey(Point)
     doc = models.FileField(_('document'), upload_to='geodocs/documents')
+    digest = models.CharField(max_length=255, editable=False)
+
+    class Meta:
+        unique_together = (('point', 'digest'), )
+        verbose_name = _('document')
+
+    def clean(self):
+        if self.doc:
+            d = hashlib.sha256()
+            for chunk in self.doc.chunks():
+                d.update(chunk)
+            self.digest = d.hexdigest()
+
+
 
 # This is here, not in another file, just because cursor.execute() gave "syntax error" otherways
+# (I guess because of encodong/decoding problems)
 _trigger_query = """DO
   $BODY$
     BEGIN

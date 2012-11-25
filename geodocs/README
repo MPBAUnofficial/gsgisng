@@ -3,6 +3,7 @@ Geodocs
 
 A django app to handle georeferenced images and documents.
 
+
 Installation
 ------------
 
@@ -21,17 +22,22 @@ Does not require geodjango to be configured.
 * run syncdb
 * include geodocs.urls from your urls
     url(r'^geodocs', include('geodocs.urls'))
-* set up a layer in eyour geoserver/whatever that takes as source
-  the postgres geodocs_point table in your database
+* set up a layer in eyour geoserver(or mapserver or whatever) that takes 
+  as source the postgres geodocs_point table in your database
+
 
 Configuration
 -------------
 
-You may set following constants in your django settings module:
+Required coniguration in your django settings module:
 
 * **GEODOCS_SRID** SRID to be used (as the integer EPSG number). 
   IMPORTANT: set this before running syncdb, or it will fail. If you change it, you will have to manually operate on your db to handle this.
+
+Other possible settings parameters
+
 * **GEODOCS_NO_CSRF_PROTECTION**  boolean, default False. if True, geodocs will ignore CSRF protection even on POST requests. Only for testing, really.
+
 
 Usage
 -----
@@ -45,6 +51,9 @@ HTTP endpoints will be created:  (do not forget trailing slashes)
   **degree**
     (integer) number from 1 to 5, representing the degree
     for the new point
+
+  **topic**
+    (text) (multiple choice) 'water' | 'environment' | 'cultivation' | 'soil'
 
   **address**
     (text) the address
@@ -119,6 +128,7 @@ HTTP endpoints will be created:  (do not forget trailing slashes)
           "lon": 36.0,
           "lat": 11.0, 
           "degree": 2, 
+          "topic": "Acqua",
           "address": "via Sommarive, 17, 38121 Trento", 
           "area": <area>, 
           "images": [
@@ -145,11 +155,77 @@ HTTP endpoints will be created:  (do not forget trailing slashes)
 * http://.../delete/<pk>/
 
   (POST only) Deletes the specified point (and all related images and docs)
+  Only the owner (creating user) and the staff members (user.is_staff == True)
+  are allowed to do this!
 
   On success, returns 200 OK and {"success": true}
 
-  On failure (specified point does not exist), returns 404 and
-  {"success": false}
+  On failure - specified point does not exist - returns 404 and
+  {"success": false, "message": "A meaningful message"}
+
+  On failure - unauthorized - returns 403
+  {"success": false, "message": "A meaningful message"}
+
+
+* http://.../my-points/
+
+  If properly authenticated, returns
+
+      {
+        "success": true,
+      	"list": [{..},{..},{..},...]
+      }
+
+  where each object in the list is just like the one returned by getinfo
+
+
+* http://.../delete-image/<url>
+* http://.../delete-doc/<url>
+
+  (POST only)
+
+  only owner or staff members are allowed to delete content.
+
+  Delete the corresponding image. <url> is the complete url of the image,
+  as written in the response in /getinfo/
+
+  example of full url:  ..../delete-image//media/geodocs/images/foto-01.png
+
+
+* http://.../new-point/
+
+  (POST only) (Authentication via HTTP basic) (designed for mobile app)
+
+  Creates a new point, without multimedia data.
+
+  Expects the same fields as /new/, except the media-related ones,
+  always sent as multipart/form-data
+
+  On success, returns:
+
+      {
+        "success": true,
+        "pk": <pk>
+      }
+
+  Where <pk> is the pk of the newly-created point. This will be needed in
+  order to send correlated images.
+
+* http://.../new-image/<point_pk>/
+
+  (POST only) (Authentication via HTTP basic) (designed for mobile app)
+
+  Attaches the uploaded image to the point with given primary key.
+  Only the point owner is allowed to attach images to a point.
+
+  Expects a multipart/form-data payload with only one field:
+
+  * **image**  (binary data) the image to be uploaded
+
+  On success, returns 200 and {"success": true}
+
+  On failure, return an HTTP error and
+  {"success": false, "message": "some meaningful message"}
 
 
 Authors

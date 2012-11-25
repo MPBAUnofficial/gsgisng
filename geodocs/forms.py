@@ -6,6 +6,12 @@ class PointForm(forms.ModelForm):
     class Meta:
         model = Point
 
+    def save(self, user):
+        pt = super(PointForm, self).save(commit=False)
+        pt.user = user
+        pt.save()
+        return pt
+
 class ImageForm(forms.ModelForm):
     class Meta:
         model = Image
@@ -32,7 +38,7 @@ class DocumentForm(forms.ModelForm):
 class ImageFormSet(formset_factory(ImageForm)):
     def save(self, point):
         # NB returning a list, not an iterator,
-        # otherways f.save() will NOT be evauated !!
+        # otherways f.save() would NOT be evauated !!
         return [f.save(point) for f in self]
 
 class DocumentFormSet(formset_factory(DocumentForm)):
