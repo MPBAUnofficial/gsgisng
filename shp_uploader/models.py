@@ -4,8 +4,16 @@ from django.core.exceptions import ValidationError
 from pg2geoserver import Pg2Geoserver
 from shp_uploader import shp_uploader_settings
 from django.utils.translation import ugettext_lazy as _
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 import time
 import urllib2
+
+def _instantiate_pg2geoserver():
+    geoserver_url = shp_uploader_settings.GEOSERVER_URL
+    username = shp_uploader_settings.GEOSERVER_USER
+    password = shp_uploader_settings.GEOSERVER_PASSWORD
+    return Pg2Geoserver(geoserver_url,username,password)
 
 class UserStyle(models.Model):
     POLYGONS = "PL"
@@ -18,8 +26,12 @@ class UserStyle(models.Model):
         }
 
     #if None, the style is for all the users
-    user = models.ForeignKey(User, null=True)
-    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, null=True, blank=True,
+                             help_text=_(u"Leave blank to assign this"
+                                         " style to all the users"))
+    name = models.CharField(max_length=200,
+                            verbose_name=_(u"Geoserver style name"),
+                            help_text=_(u"Automatically generated"))
     label = models.CharField(max_length=200, verbose_name=_(u"Style Name"))
     xml = models.TextField()
     feature_type = models.CharField(max_length=2,
@@ -39,25 +51,50 @@ class UserStyle(models.Model):
                 }
 
     def clean(self):
-        """Validates the xml indexing it on the geoserver"""
-        geoserver_url = shp_uploader_settings.GEOSERVER_URL
-        username = shp_uploader_settings.GEOSERVER_USER
-        password = shp_uploader_settings.GEOSERVER_PASSWORD
-        p2g = Pg2Geoserver(geoserver_url,username,password)
-        #if a style was already indexed on geoserver delete it
+        """Validates the xml indexing it on the geoserver
+        Maybe it should be refactorized cause it has side effects
+        on the geoserver... This implementation tries to avoid
+        side effects problems.
+        """
+        try:
+            self.clean_fields(exclude=('name',))
+        except ValidationError, e:
+            return
+        p2g = _instantiate_pg2geoserver()
+
+        to_delete = None
+        #if a style was already indexed on geoserver mark it for deletion
         if self.name:
-            try:
-                p2g.delete_style(self.name)
-            except (urllib2.HTTPError,urllib2.URLError):
-                #if something were wrong go on
-                pass
-        self.name = self.label + str(self.user.id) + str(int(time.time()))
+            to_delete = self.name
+
+        if self.user:
+            self.name = self.label + str(self.user.id) + str(int(time.time()))
+        else:
+            self.name = self.label + str(int(time.time()))
         try:
             p2g.create_style(self.name, self.xml)
         except urllib2.HTTPError as e:
             raise ValidationError("Could not validate the style.")
         except urllib2.URLError as e:
             raise ValidationError("Could not validate the style: "+str(e))
+
+        #delete previous style
+        if to_delete:
+            try:
+                p2g.delete_style(to_delete)
+            except (urllib2.HTTPError,urllib2.URLError):
+                #if something were wrong go on
+                pass
+
+@receiver(pre_delete, sender=UserStyle)
+def style_delete_handler(sender, **kwargs):
+    obj = kwargs['instance']
+    p2g = _instantiate_pg2geoserver()
+    try:
+        p2g.delete_style(obj.name)
+    except (urllib2.HTTPError,urllib2.URLError):
+        #if something were wrong go on
+        pass
 
 class UserLayer(models.Model):
     user = models.ForeignKey(User)
@@ -83,3 +120,4 @@ class UserLayer(models.Model):
                 'datastore': self.datastore,
                 'created_at': str(self.created_at),
                 }
+
