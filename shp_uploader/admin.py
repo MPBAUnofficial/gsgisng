@@ -1,8 +1,9 @@
 from django.contrib import admin
 from shp_uploader.models import UserStyle, UserLayer
+from forms import ShapeForm
 
 class UserLayerAdmin(admin.ModelAdmin):
-    pass
+    form = ShapeForm
 
 class UserStyleAdmin(admin.ModelAdmin):
     exclude = ('name',)
