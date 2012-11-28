@@ -38,8 +38,8 @@ class ElementCatalogLink(GeoTreeModel):
 class CatalogIndicator(GeoTreeModel, CatalogMixin):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    creation_time = models.DateTimeField()
-    numcode = models.IntegerField()
+    creation_time = models.DateTimeField(auto_now_add=True)
+    numcode = models.IntegerField(default=0)
     remotehost = models.CharField(max_length=255, blank=True)
     remoteport = models.IntegerField(null=True, blank=True)
     remotedb = models.CharField(max_length=255, blank=True)
@@ -81,8 +81,8 @@ class IndicatorGroup(GeoTreeModel):
 
 class IndicatorTree(GeoTreeModel):
     id = models.AutoField(primary_key=True)
-    indicator_group = models.ForeignKey(IndicatorGroup, unique=True)
-    parent_group = models.ForeignKey(IndicatorGroup)
+    indicator_group = models.ForeignKey(IndicatorGroup, unique=True, related_name='child_indicator')
+    parent_group = models.ForeignKey(IndicatorGroup, related_name='parent_indicator')
     class Meta:
         app_label=u'pybab'
         db_table = u'gt_indicator_tree'
@@ -95,8 +95,8 @@ class IndicatorTree(GeoTreeModel):
 class CatalogStatistical(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    creation_time = models.DateTimeField()
-    numcode = models.IntegerField()
+    creation_time = models.DateTimeField(auto_now_add=True)
+    numcode = models.IntegerField(default=0)
     remotehost = models.CharField(max_length=255, blank=True)
     remoteport = models.IntegerField(null=True, blank=True)
     remotedb = models.CharField(max_length=255, blank=True)
@@ -133,8 +133,8 @@ class StatisticalGroup(GeoTreeModel):
 
 class StatisticalTree(GeoTreeModel):
     id = models.AutoField(primary_key=True)
-    statistical_group = models.ForeignKey(StatisticalGroup, unique=True)
-    parent_group = models.ForeignKey(StatisticalGroup)
+    statistical_group = models.ForeignKey(StatisticalGroup, unique=True, related_name='child_statistical')
+    parent_group = models.ForeignKey(StatisticalGroup, related_name='parent_statistical')
 
     class Meta:
         app_label = u'pybab'
@@ -148,8 +148,8 @@ class StatisticalTree(GeoTreeModel):
 class CatalogLayer(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    creation_time = models.DateTimeField()
-    numcode = models.IntegerField()
+    creation_time = models.DateTimeField(auto_now_add=True)
+    numcode = models.IntegerField(default=0)
     remotehost = models.CharField(max_length=255, blank=True)
     remoteport = models.IntegerField(null=True, blank=True)
     remotedb = models.CharField(max_length=255, blank=True)
@@ -191,8 +191,8 @@ class LayerGroup(GeoTreeModel):
 
 class LayerTree(GeoTreeModel):
     id = models.AutoField(primary_key=True)
-    layer_tree = models.ForeignKey(LayerGroup, unique=True)
-    parent_group = models.ForeignKey(LayerGroup)
+    layer_tree = models.ForeignKey(LayerGroup, unique=True, related_name="child_layer")
+    parent_group = models.ForeignKey(LayerGroup, related_name="parent_layer")
 
     class Meta:
         app_label=u'pybab'
@@ -206,8 +206,8 @@ class LayerTree(GeoTreeModel):
 class Catalog(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    creation_time = models.DateTimeField()
-    numcode = models.IntegerField()
+    creation_time = models.DateTimeField(auto_now_add=True)
+    numcode = models.IntegerField(default=0)
     remotehost = models.CharField(max_length=255, blank=True)
     remoteport = models.IntegerField(null=True, blank=True)
     remotedb = models.CharField(max_length=255, blank=True)
