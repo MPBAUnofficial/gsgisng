@@ -6,6 +6,6 @@ __all__ = [ 'Label', 'Element',
 
 from .tree import Label, Element
 from .catalog import CatalogIndicator, IndicatorGroup, IndicatorTree
-from .catqlog import CatalogStatistical, StatisticalGroup, StatisticalTree
+from .catalog import CatalogStatistical, StatisticalGroup, StatisticalTree
 from .catalog import CatalogLayer, LayerGroup, LayerTree
 from .catalog import Catalog, Meta

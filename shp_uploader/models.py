@@ -1,4 +1,5 @@
 from django.db import models
+from pybab.models import CatalogLayer
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from pg2geoserver import Pg2Geoserver
@@ -98,16 +99,16 @@ def style_delete_handler(sender, **kwargs):
 
 class UserLayer(models.Model):
     user = models.ForeignKey(User)
-    layer_name = models.CharField(max_length=200)
+    layer = models.ForeignKey(CatalogLayer, unique=True)
     style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
-    label = models.CharField(max_length=200)
-    schema = models.CharField(max_length=200)
-    workspace = models.CharField(max_length=200)
-    datastore = models.CharField(max_length=200)
-    created_at = models.DateTimeField(auto_now_add = True)
 
-    def get_feature_type(self):
-        return self.style.feature_type
+    #layer_name = models.CharField(max_length=200)
+
+    #label = models.CharField(max_length=200)
+    #schema = models.CharField(max_length=200)
+    #workspace = models.CharField(max_length=200)
+    #datastore = models.CharField(max_length=200)
+    #created_at = models.DateTimeField(auto_now_add = True)
 
     def as_dict(self):
         return {'pk': self.pk,
