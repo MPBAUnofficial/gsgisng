@@ -112,13 +112,12 @@ class UserLayer(models.Model):
 
     def as_dict(self):
         return {'pk': self.pk,
-                'layer_name': self.layer_name,
-                'label': self.label,
+                'layer_name': self.layer.gs_name,
+                'label': self.layer.name,
                 'style_label': str(self.style),
                 'style_name': self.style.name,
-                'schema': self.schema,
-                'workspace': self.workspace,
-                'datastore': self.datastore,
-                'created_at': str(self.created_at),
+                'schema': self.layer.tableschema,
+                'workspace': self.layer.gs_workspace,
+                'created_at': str(self.layer.creation_time),
                 }
 

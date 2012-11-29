@@ -42,7 +42,7 @@ class ShapeForm(forms.ModelForm):
     epsg_code = forms.IntegerField(label="EPSG:")
     style = forms.ModelChoiceField(queryset=UserStyle.objects.all())
     shape_zip = forms.FileField()
-    tablename = forms.TextField(widget=forms.HiddenInput())
+    tablename = forms.CharField(widget=forms.HiddenInput())
     gs_name = forms.CharField(widget=forms.HiddenInput())
 
     def clean(self):
@@ -76,7 +76,7 @@ class ShapeForm(forms.ModelForm):
         else:
             #index on geoserver
             res = _toGeoserver(layer_id)
-            if not res:
+            if not res==True:
                 _delete_layer_postgis(shp_uploader_settings.SCHEMA_USER_UPLOADS,
                                       layer_id)
                 msg = "Failed to index the layer on geoserver."
