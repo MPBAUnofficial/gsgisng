@@ -1,23 +1,49 @@
+from django.db import connection, transaction, DatabaseError
 from django.contrib.gis.db import models
 
-class GeoTreeError(Exception):
+class get_raw_cursor(object):
+    def __init__(self, cursor_name=None):
+        if cursor_name is not None:
+            self.cursor_name = cursor_name
+
+    def __enter__(self):
+        if getattr(self, 'cursor_name', None) is not None:
+            return connection.cursor(self.cursor_name)
+        else:
+            return connection.cursor()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is not None:
+            transaction.rollback()
+            return False # Raise the exception up ...
+
+        transaction.commit_unless_managed()
+
+class GeoTreeError(DatabaseError):
     def __init__(self, message):
         super(GeoTreeError, self).__init__(message)
 
     @classmethod
-    def from_db_error(cls, error):
+    def from_database_error(cls, error):
         # TODO: create new instance of GeoTreeError
         # e.g.: instanciate a new cls() using `error` somehow.
-        pass
+        # For now it just returns the exception itself
+        return error
 
 class GeoTreeModel(models.Model):
 
     def save(self,force_insert=False, force_update=False):
         try:
             super(GeoTreeModel, self).save(self, force_insert=force_insert, force_update=force_update)
-        except DatabaseError as err:
-            # TODO: find out where to import DatabaseError
-            raise GeoTreeError.from_db_error( err )
+        except DatabaseError as dberr:
+            raise GeoTreeError.from_database_error(dberr)
+
+    def delete(self):
+        try:
+            super(GeoTreeModel, self).save(self)
+        except DatabaseError as dberr:
+            raise GeoTreeError.from_database_error(dberr)
+
     class Meta(object):
         abstract=True
         app_label=u'pybab'

@@ -1,7 +1,6 @@
 from django.contrib.gis.db import models
 from django.db.models import Q
-from .commons import AdditionalData, GeoTreeModel
-from ..context_managers import get_raw_cursor
+from .commons import get_raw_cursor, AdditionalData, GeoTreeModel
 
 # ===========================================================================
 # Element to Label link (with validity)

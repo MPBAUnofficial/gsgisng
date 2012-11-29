@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from .tree import Element
-from .commons import GeoTreeModel, GeoTreeError
+from .commons import GeoTreeModel, GeoTreeError, open_raw_cursor
 
 # ===========================================================================
 # Utilities
@@ -150,22 +150,33 @@ class CatalogLayer(GeoTreeModel):
     name = models.CharField(max_length=255)
     creation_time = models.DateTimeField(auto_now_add=True)
     numcode = models.IntegerField(default=0)
-    remotehost = models.CharField(max_length=255, blank=True)
+    remotehost = models.CharField(max_length=255, blank=True, null=True)
     remoteport = models.IntegerField(null=True, blank=True)
-    remotedb = models.CharField(max_length=255, blank=True)
-    remoteuser = models.CharField(max_length=255, blank=True)
-    remotepass = models.CharField(max_length=255, blank=True)
-    tableschema = models.TextField(blank=True) # This field type is a guess.
-    tablename = models.TextField(blank=True) # This field type is a guess.
+    remotedb = models.CharField(max_length=255, blank=True, null=True)
+    remoteuser = models.CharField(max_length=255, blank=True, null=True)
+    remotepass = models.CharField(max_length=255, blank=True, null=True)
+    tableschema = models.TextField(blank=True, null=True)
+    tablename = models.TextField(blank=True, null=True) 
     layer_group = models.ForeignKey('LayerGroup')
-    code_column = models.TextField(blank=True) # This field type is a guess.
-    time_column = models.TextField(blank=True) # This field type is a guess.
-    geom_column = models.TextField(blank=True) # This field type is a guess.
-    ui_qtip = models.CharField(max_length=255, blank=True)
+    code_column = models.TextField(blank=True, null=True) 
+    time_column = models.TextField(blank=True, null=True)
+    geom_column = models.TextField(blank=True, null=True)
+    ui_qtip = models.CharField(max_length=255, blank=True, null=True)
     gs_name = models.CharField(max_length=255)
-    gs_workspace = models.CharField(max_length=255, blank=True)
+    gs_workspace = models.CharField(max_length=255, blank=True, null=True)
     gs_url = models.CharField(max_length=255)
-    gs_legend_url = models.CharField(max_length=255, blank=True)
+    gs_legend_url = models.CharField(max_length=255, blank=True, null=True)
+
+    def import_elements_from(self, name_column, parent_column, elements_rank):
+        if self.tablename is None or self.tablename == "":
+            raise GeoTreeError("Can't import layer into catalog because tablename is not defined.")
+        proc_name = u'gt_layer_import'
+        args = [self.pk, name_column, parent_column, elements_rank]
+        with open_raw_cursor() as cursor:
+            cursor.callproc(proc_name, args)
+            results = cursor.fetchall()
+
+        return results
 
     class Meta:
         app_label=u'pybab'
