@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from .tree import Element
-from .commons import GeoTreeModel, GeoTreeError, open_raw_cursor
+from .commons import GeoTreeModel, GeoTreeError, get_raw_cursor
 
 # ===========================================================================
 # Utilities

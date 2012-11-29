@@ -34,13 +34,13 @@ class GeoTreeModel(models.Model):
 
     def save(self,force_insert=False, force_update=False):
         try:
-            super(GeoTreeModel, self).save(self, force_insert=force_insert, force_update=force_update)
+            super(GeoTreeModel, self).save(force_insert=force_insert, force_update=force_update)
         except DatabaseError as dberr:
             raise GeoTreeError.from_database_error(dberr)
 
     def delete(self):
         try:
-            super(GeoTreeModel, self).save(self)
+            super(GeoTreeModel, self).save()
         except DatabaseError as dberr:
             raise GeoTreeError.from_database_error(dberr)
 

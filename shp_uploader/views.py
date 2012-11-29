@@ -23,11 +23,12 @@ def upload_shp(request):
                 'errors': _(u"You have too many layers uploaded, \
                               delete some of them.")
                 },{'cls': HttpResponseForbidden}
-
+    from pybab.models import LayerGroup
     form = ShapeForm(
+        user,
         request.POST,
         request.FILES,
-        user=user)
+        instance=LayerGroup.objects.get(pk=0))
     if form.is_valid():
         form.save()
         return {'success': True}

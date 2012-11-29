@@ -71,7 +71,7 @@ class UserStyle(models.Model):
         if self.user:
             self.name = self.label + str(self.user.id) + str(int(time.time()))
         else:
-            self.name = self.label + str(int(time.time()))
+            self.name = self.label + "_adm_" + str(int(time.time()))
         try:
             p2g.create_style(self.name, self.xml)
         except urllib2.HTTPError as e:
