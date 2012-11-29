@@ -7,6 +7,7 @@ from shp_uploader import shp_uploader_settings
 from django.utils.translation import ugettext_lazy as _
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
+from shp_uploader import shape_utils
 import time
 import urllib2
 
@@ -102,14 +103,6 @@ class UserLayer(models.Model):
     layer = models.ForeignKey(CatalogLayer, unique=True)
     style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
 
-    #layer_name = models.CharField(max_length=200)
-
-    #label = models.CharField(max_length=200)
-    #schema = models.CharField(max_length=200)
-    #workspace = models.CharField(max_length=200)
-    #datastore = models.CharField(max_length=200)
-    #created_at = models.DateTimeField(auto_now_add = True)
-
     def as_dict(self):
         return {'pk': self.pk,
                 'layer_name': self.layer.gs_name,
@@ -121,3 +114,9 @@ class UserLayer(models.Model):
                 'created_at': str(self.layer.creation_time),
                 }
 
+@receiver(pre_delete, sender=CatalogLayer)
+def cataloglayer_delete_handler(sender, **kwargs):
+    catalogLayer = kwargs['instance']
+    shape_utils._delete_layer_postgis(catalogLayer.tableschema,
+                                      catalogLayer.tablename)
+    shape_utils._remove_layer_geoserver(catalogLayer)

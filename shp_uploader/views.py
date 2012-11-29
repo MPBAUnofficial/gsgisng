@@ -23,14 +23,20 @@ def upload_shp(request):
                 'errors': _(u"You have too many layers uploaded, \
                               delete some of them.")
                 },{'cls': HttpResponseForbidden}
-    from pybab.models import LayerGroup
     form = ShapeForm(
         user,
         request.POST,
-        request.FILES,
-        instance=LayerGroup.objects.get(pk=0))
+        request.FILES)
     if form.is_valid():
-        form.save()
+        userStyle = form.cleaned_data["style"]
+        catalogLayer = form.save()
+        userLayer = UserLayer()
+
+        userLayer.style = userStyle
+        userLayer.layer = catalogLayer
+        userLayer.user = user
+        userLayer.save()
+
         return {'success': True}
     else:
         return {'success': False,
@@ -41,13 +47,13 @@ def upload_shp(request):
 @render_to_json()
 def delete_shp(request, pk):
     try:
-        layer = UserLayer.objects.get(pk=pk)
+        layer = UserLayer.objects.get(pk=pk).layer
     except UserLayer.DoesNotExist:
         return ({'success': False,
                  'message': 'Layer {} does not exist'.format(pk)},
                 {'cls': HttpResponseNotFound})
-    _remove_layer_geoserver(layer)
-    _delete_layer_postgis(layer.schema, layer.layer_name)
+    #notes that this will delete also the user layer as a consequence of the
+    #CASCADE trigger
     layer.delete()
     return {'success': True}
 
@@ -97,11 +103,10 @@ def delete_style(request, pk):
     except models.ProtectedError, e:
         msg = ("Cannot delete the style '{}' because "
                "it is associate to the following layer: ").format(style.label)
-        msg += " ".join(["'"+s.label+"'" for s in style.userlayer_set.all()])
+        msg += " ".join(["'"+s.layer.name+"'" for s in style.userlayer_set.all()])
         return ({'success': False,
                  'message': msg},
                 {'cls': HttpResponseBadRequest})
-    _remove_style_geoserver(style)
     return {'success': True}
 
 @login_required_json({'success': False,

@@ -38,11 +38,12 @@ class GeoTreeModel(models.Model):
         except DatabaseError as dberr:
             raise GeoTreeError.from_database_error(dberr)
 
-    def delete(self):
-        try:
-            super(GeoTreeModel, self).save()
-        except DatabaseError as dberr:
-            raise GeoTreeError.from_database_error(dberr)
+####  ma che caz... e' sto codice???   ###
+#    def delete(self):
+#        try:
+#            super(GeoTreeModel, self).save()
+#        except DatabaseError as dberr:
+#            raise GeoTreeError.from_database_error(dberr)
 
     class Meta(object):
         abstract=True
