@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from django.db.models import Q
-from .commons import get_raw_cursor, AdditionalData, GeoTreeModel
+from .commons import get_raw_cursor, AdditionalData, GeoTreeModel, pg_execute
 
 # ===========================================================================
 # Element to Label link (with validity)
@@ -44,12 +44,12 @@ class ElementManager(models.Manager):
 
     def by_labels(self, labels, strict=False):
         proc_name = u'gt_elements_by_labels' if not strict else u'gt_elements_by_labels_strict'
-        args = [label.name for label in labels]
-        with get_raw_cursor() as cursor:
-            cursor.callproc(proc_name, args)
-            result = [res[0] for res in cursor.fetchall()]
-
+        result = [res[0] for res in pg_execute(proc_name, [label.name for label in labels])]
         return super(ElementManager, self).get_query_set().filter(code__in=result)
+
+    def by_catalog_with_data(catalog, extra_columns=None, where_clause=None):
+        pass
+        
 
 
 class Element(GeoTreeModel):
@@ -66,15 +66,17 @@ class Element(GeoTreeModel):
 
     def labels_with_validity(self, time_start=None, time_end=None):
         attrs = Attribute._filter_by_date(self.attribute_set, time_start, time_end)
-        labels = []
-        for attribute in attrs:
-            label = attribute.gt_label
-            setattr(label, 'additional_data', AdditionalData())
-            label.additional_data.add('time_start', attribute.timestart)
-            label.additional_data.add('time_end', attribute.timeend)
-            labels.append(label)
+        #labels = []
+        #for attribute in attrs:
+        #    label = attribute.gt_label
+        #    setattr(label, 'additional_data', AdditionalData())
+        #    label.additional_data.add('time_start', attribute.timestart)
+        #    label.additional_data.add('time_end', attribute.timeend)
+        #    labels.append(label)
 
-        return labels
+        #return labels
+        return AdditionalData.attach_to_objects_from_model(attrs,
+                {'timestart':'time_start', 'timeend':'time_end'}, 'gt_label')
 
     def attach_child(self, child):
         link = Tree(gt_element=child, gt_parent=self)
@@ -115,15 +117,12 @@ class Label(GeoTreeModel):
     def add_to_elements(self, elements, time_start=None, time_end=None):
         proc_name = u'gt_elements_add_label'
         element_codes = [element.code for element in elements]
-        with get_raw_cursor() as cursor:
-            if time_start is None and time_end is None:
-                cursor.callproc(proc_name, [element_codes, self.name])
-            else:
-                cursor.callproc(proc_name, [element_codes, self.name, time_start, time_end])
+        if time_start is None and time_end is None:
+            args = [element_codes, self.name]
+        else:
+            args = [element_codes, self.name, time_start, time_end]
 
-            result = cursor.fetchone()
-
-        return result
+        return pg_execute(proc_name, args, fetchone=True)
 
     def remove_from_elements(self, elements):
         proc_name = 'gt_elements_remove_label'
@@ -144,7 +143,8 @@ class Label(GeoTreeModel):
             element.additional_data.add('time_end', attribute.timeend)
             elements.append(element)
 
-        return elements
+        return AdditionalData.attach_to_objects_from_model(attrs,
+                {'timestart':'time_start','timeend':'time_end'}, 'gt_element')
 
     def __unicode__(self):
         return self.name

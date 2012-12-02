@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from .tree import Element
-from .commons import GeoTreeModel, GeoTreeError, open_raw_cursor
+from .commons import GeoTreeModel, GeoTreeError, get_raw_cursor
 
 # ===========================================================================
 # Utilities
@@ -26,6 +26,7 @@ class ElementCatalogLink(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     gt_element = models.ForeignKey(Element, related_name="catalog_link_elements")
     gt_catalog_id = models.ForeignKey('Catalog')
+
     class Meta:
         app_label = u'pybab'
         db_table = u'gt_element_catalog_link'
@@ -40,21 +41,21 @@ class CatalogIndicator(GeoTreeModel, CatalogMixin):
     name = models.CharField(max_length=255)
     creation_time = models.DateTimeField(auto_now_add=True)
     numcode = models.IntegerField(default=0)
-    remotehost = models.CharField(max_length=255, blank=True)
+    remotehost = models.CharField(max_length=255, blank=True, null=True)
     remoteport = models.IntegerField(null=True, blank=True)
-    remotedb = models.CharField(max_length=255, blank=True)
-    remoteuser = models.CharField(max_length=255, blank=True)
-    remotepass = models.CharField(max_length=255, blank=True)
-    tableschema = models.TextField() # This field type is a guess.
-    tablename = models.TextField() # This field type is a guess.
+    remotedb = models.CharField(max_length=255, blank=True, null=True)
+    remoteuser = models.CharField(max_length=255, blank=True, null=True)
+    remotepass = models.CharField(max_length=255, blank=True, null=True)
+    tableschema = models.TextField() 
+    tablename = models.TextField() 
     indicator_group = models.ForeignKey('IndicatorGroup')
-    code_column = models.TextField() # This field type is a guess.
-    data_column = models.TextField() # This field type is a guess.
-    time_column = models.TextField(blank=True) # This field type is a guess.
-    ui_palette = models.CharField(max_length=255, blank=True)
-    ui_quartili = models.TextField(blank=True)
+    code_column = models.TextField() 
+    data_column = models.TextField() 
+    time_column = models.TextField(blank=True, null=True) 
+    ui_palette = models.CharField(max_length=255, blank=True, null=True)
+    ui_quartili = models.TextField(blank=True, null=True)
     gs_name = models.CharField(max_length=255)
-    gs_workspace = models.CharField(max_length=255, blank=True)
+    gs_workspace = models.CharField(max_length=255, blank=True, null=True)
     gs_url = models.CharField(max_length=255)
 
     class Meta:
@@ -99,15 +100,18 @@ class CatalogStatistical(GeoTreeModel):
     numcode = models.IntegerField(default=0)
     remotehost = models.CharField(max_length=255, blank=True)
     remoteport = models.IntegerField(null=True, blank=True)
-    remotedb = models.CharField(max_length=255, blank=True)
-    remoteuser = models.CharField(max_length=255, blank=True)
-    remotepass = models.CharField(max_length=255, blank=True)
+    remotedb = models.CharField(max_length=255, blank=True, null=True)
+    remoteuser = models.CharField(max_length=255, blank=True, null=True)
+    remotepass = models.CharField(max_length=255, blank=True, null=True)
     tableschema = models.TextField() # This field type is a guess.
     tablename = models.TextField() # This field type is a guess.
     statistical_group = models.ForeignKey('StatisticalGroup')
     code_column = models.TextField() # This field type is a guess.
     data_column = models.TextField() # This field type is a guess.
-    time_column = models.TextField(blank=True) # This field type is a guess.
+    time_column = models.TextField(blank=True, null=True) # This field type is a guess.
+
+    def save(self, force_insert=False, force_update=False):
+        pass
 
     class Meta:
         app_label = u'pybab'
@@ -172,7 +176,7 @@ class CatalogLayer(GeoTreeModel):
             raise GeoTreeError("Can't import layer into catalog because tablename is not defined.")
         proc_name = u'gt_layer_import'
         args = [self.pk, name_column, parent_column, elements_rank]
-        with open_raw_cursor() as cursor:
+        with get_raw_cursor() as cursor:
             cursor.callproc(proc_name, args)
             results = cursor.fetchall()
 
@@ -219,13 +223,15 @@ class Catalog(GeoTreeModel):
     name = models.CharField(max_length=255)
     creation_time = models.DateTimeField(auto_now_add=True)
     numcode = models.IntegerField(default=0)
-    remotehost = models.CharField(max_length=255, blank=True)
+    remotehost = models.CharField(max_length=255, blank=True, null=True)
     remoteport = models.IntegerField(null=True, blank=True)
-    remotedb = models.CharField(max_length=255, blank=True)
-    remoteuser = models.CharField(max_length=255, blank=True)
-    remotepass = models.CharField(max_length=255, blank=True)
-    tableschema = models.TextField(blank=True) # This field type is a guess.
-    tablename = models.TextField(blank=True) # This field type is a guess.
+    remotedb = models.CharField(max_length=255, blank=True, null=True)
+    remoteuser = models.CharField(max_length=255, blank=True, null=True)
+    remotepass = models.CharField(max_length=255, blank=True, null=True)
+    tableschema = models.TextField(blank=True, null=True) # This field type is a guess.
+    tablename = models.TextField(blank=True, null=True) # This field type is a guess.
+    code_column = models.TextField(blank=True, null=True)
+    time_column = models.TextField(blank=True, null=True)
 
     @property
     def specific(self):
@@ -259,10 +265,10 @@ class Catalog(GeoTreeModel):
 
 class Meta(GeoTreeModel):
     id = models.AutoField(primary_key=True)
-    gt_catalog = models.ForeignKey(Catalog, unique=True)
-    description = models.TextField(blank=True)
-    source = models.TextField(blank=True)
-    measure_unit = models.TextField(blank=True)
+    gt_catalog = models.ForeignKey(Catalog, unique=True, related_name="metadata_set")
+    description = models.TextField(blank=True, null=True)
+    source = models.TextField(blank=True, null=True)
+    measure_unit = models.TextField(blank=True, null=True)
     class Meta:
         app_label = u'pybab'
         db_table = u'gt_meta'
