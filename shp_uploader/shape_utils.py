@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.db.utils import DatabaseError
+from django.db import connection, transaction
 from shp_uploader import shp_uploader_settings
 import shutil, tempfile
 import zipfile
@@ -100,21 +102,8 @@ def _remove_layer_geoserver(layer):
     password = shp_uploader_settings.GEOSERVER_PASSWORD
     p2g = Pg2Geoserver(geoserver_url,username,password)
     try:
-        p2g.delete_layer(layer_name=layer.layer_name)
+        p2g.delete_layer(layer_name=layer.gs_name)
     except (urllib2.HTTPError, urllib2.URLError), e:
         #if there were problems do nothing:
         #go on with the elminiation of the layer
-        print e
-
-def _remove_style_geoserver(style):
-    #remove style from geoserver
-    geoserver_url = shp_uploader_settings.GEOSERVER_URL
-    username = shp_uploader_settings.GEOSERVER_USER
-    password = shp_uploader_settings.GEOSERVER_PASSWORD
-    p2g = Pg2Geoserver(geoserver_url,username,password)
-    try:
-        p2g.delete_style(style_name=style.name)
-    except (urllib2.HTTPError, urllib2.URLError), e:
-        #if there were problems do nothing:
-        #go on with the elminiation of the style
         print e

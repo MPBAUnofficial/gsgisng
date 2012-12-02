@@ -5,7 +5,7 @@ from shp_uploader.models import UserStyle, UserLayer
 from pybab.models import CatalogLayer, LayerGroup
 from django.utils.translation import ugettext_lazy as _
 from shp_uploader.shape_utils import _unzip_save, _upload2pg, _toGeoserver
-import zipfile
+import zipfile, shutil
 import time
 
 def _check_number_files(extension, zip):
@@ -23,17 +23,17 @@ class ShapeForm(forms.ModelForm):
     def __init__(self, user=None, *args, **kwargs):
         if "instance" not in kwargs:
             kwargs["instance"] = CatalogLayer()
-        kwargs["instance"].remotehost = DATABASES['default']['HOST']
-        kwargs["instance"].remotedb = DATABASES['default']['NAME']
-        kwargs["instance"].remoteport = DATABASES['default']['PORT']
-        kwargs["instance"].remoteuser = DATABASES['default']['USER']
-        kwargs["instance"].remotepass = DATABASES['default']['PASSWORD']
+        kwargs["instance"].remotehost = settings.DATABASES['default']['HOST']
+        kwargs["instance"].remotedb = settings.DATABASES['default']['NAME']
+        kwargs["instance"].remoteport = settings.DATABASES['default']['PORT']
+        kwargs["instance"].remoteuser = settings.DATABASES['default']['USER']
+        kwargs["instance"].remotepass =settings.DATABASES['default']['PASSWORD']
         kwargs["instance"].tableschema = \
             shp_uploader_settings.SCHEMA_USER_UPLOADS
         kwargs["instance"].gs_workspace = \
             shp_uploader_settings.WORKSPACE_USER_UPLOADS
         kwargs["instance"].gs_url = shp_uploader_settings.GEOSERVER_URL
-        kwargs["instance"].geom_column = "geom"
+        kwargs["instance"].geom_column = "wkb_geometry"
         kwargs["instance"].layergroup = LayerGroup.objects.get(pk=0)
 
         super(ShapeForm, self).__init__(*args, **kwargs)
@@ -42,23 +42,20 @@ class ShapeForm(forms.ModelForm):
     epsg_code = forms.IntegerField(label="EPSG:")
     style = forms.ModelChoiceField(queryset=UserStyle.objects.all())
     shape_zip = forms.FileField()
-    tablename = forms.CharField(widget=forms.HiddenInput())
-    gs_name = forms.CharField(widget=forms.HiddenInput())
 
     def clean(self):
         """Uploads the layer to postgis and indexes it on geoserver in order
         to check if everything is correct
         WARNING: this clean method has side effects, it is done that way
         because it needs to raise execptions"""
-        layer_label = self.data["name"]
+        cleaned_data = super(ShapeForm, self).clean()
+
+        layer_label = self.cleaned_data["name"]
         if self.user:
             layer_id = layer_label + str(self.user.id) + str(int(time.time()))
         else:
-            layer_id = layer_label + str(int(time.time()))
-        self.data["tablename"] = layer_id
-        self.data["gs_name"] = layer_id
-
-        cleaned_data = super(ShapeForm, self).clean()
+            layer_id = layer_label + "_adm_" + str(int(time.time()))
+        self.layer_id = layer_id
 
         #unzip the file
         dir = _unzip_save(self.cleaned_data["shape_zip"],
@@ -71,7 +68,7 @@ class ShapeForm(forms.ModelForm):
         if not res==True:
             msg = "Failed to store the layer in postgis."
             msg += "Check the EPSG code {} and if the shape is valid.".format(
-                form.cleaned_data['epsg_code'])
+                self.cleaned_data['epsg_code'])
             raise forms.ValidationError(msg)
         else:
             #index on geoserver
@@ -84,6 +81,18 @@ class ShapeForm(forms.ModelForm):
                 raise forms.ValidationError(msg)
 
         return cleaned_data
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+        catalogLayer = super(ShapeForm, self).save(commit=False)
+
+        catalogLayer.tablename = self.layer_id
+        catalogLayer.gs_name = self.layer_id
+        catalogLayer.layer_group = LayerGroup.objects.get(pk=0)
+        catalogLayer.code_column = "null" #why should I set this?
+
+        if commit:
+            catalogLayer.save()
+        return catalogLayer
 
     def clean_shape_zip(self):
         zip_file = self.cleaned_data['shape_zip']
@@ -111,9 +120,7 @@ class ShapeForm(forms.ModelForm):
 
     class Meta:
         model = CatalogLayer
-        fields = ("name",
-                  "tablename",
-                  "gs_name")
+        fields = ("name",)
 
 class UserStyleForm(forms.ModelForm):
     #def __init__(self):
