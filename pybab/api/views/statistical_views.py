@@ -7,5 +7,5 @@ from .commons import login_required_json_default, get_subtree_for
 def catalog_statistical(request, tree_index):
     user = request.user
     if request.method == 'GET':
-        return get_subtree_for(user, tree_index, StatisticalGroup, CatalogStatistical)
+        return get_subtree_for(user, int(tree_index), StatisticalGroup, CatalogStatistical)
 
