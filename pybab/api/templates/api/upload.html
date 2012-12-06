@@ -1,0 +1,25 @@
+{% load i18n %}
+{% load url from future %}
+
+<html>
+  <head>
+    <title>Shape upload</title>
+  </head>
+  <body>
+    <form action="{% url "pybab.api.views.upload_layer" %}" method="post" enctype="multipart/form-data">
+      <table>
+          {{ shape_form.as_table }}
+      </table>
+      {% csrf_token %}
+      <input type="submit" value="{% trans "Upload shape file" %}" />
+    </form>
+
+    <form action="{% url "pybab.api.views.upload_style" %}" method="post" enctype="multipart/form-data">
+      <table>
+          {{ user_form.as_table }}
+      </table>
+      {% csrf_token %}
+      <input type="submit" value="{% trans "Upload style" %}" />
+    </form>
+  </body>
+</html>
