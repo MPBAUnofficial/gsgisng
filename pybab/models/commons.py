@@ -73,6 +73,7 @@ class GeoTreeModel(models.Model):
 
     class Meta(object):
         abstract=True
+        managed=False
         app_label=u'pybab'
 
 # ===========================================================================

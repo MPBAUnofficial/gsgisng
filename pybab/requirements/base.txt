@@ -1,0 +1,12 @@
+#psycopg2
+#it is suggested to install it system wired
+  #you should have this in the pythonpath
+  #/usr/lib/python2.7/dist-packages/psycopg2
+#gdal
+#it is suggested to install it system wired
+  #you should have these in the pythonpath
+  #/usr/lib/python2.7/dist-packages/osgeo
+  #/usr/lib/python2.7/dist-packages/gdal.py
+
+django>=1.3
+#djangorestframework
