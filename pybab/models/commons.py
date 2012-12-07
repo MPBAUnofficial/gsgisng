@@ -123,3 +123,13 @@ class AdditionalData(object):
             result.append(related_object)
         return result
 
+
+# ===========================================================================
+# Catalog common utils
+# ===========================================================================
+
+
+def dict_union(dict1, dict2):
+    dict_temp = dict1.copy()
+    return dict_temp.update(dict2)
+

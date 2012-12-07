@@ -25,9 +25,9 @@ def get_subtree_for(user, group_index, group_class, catalog_class):
 
     folders = [f.to_dict() for f in root.children]
     public_catalogs = _add_to_dicts(
-            [cat.to_dict() for cat in get_system_catalogs(catalog_class, (group_index + 1))], 'public', True)
+            [cat.to_dict() for cat in get_system_catalogs(catalog_class, group_index)], 'public', True)
     private_catalogs = _add_to_dicts(
-            [cat.to_dict() for cat in get_user_catalogs(user, catalog_class, (group_index + 1))], 'public', False)
+            [cat.to_dict() for cat in get_user_catalogs(user, catalog_class, group_index)], 'public', False)
 
     return {'success':'true',
             'requested':root.to_dict(),

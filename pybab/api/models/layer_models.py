@@ -81,21 +81,10 @@ def style_update_handler(sender, **kwargs):
             #if something were wrong go on
             pass
 
-class UserLayer(models.Model):
-    user = models.ForeignKey(User, null=True)
-    layer = models.ForeignKey(CatalogLayer, unique=True)
+class UserLayerLink(models.Model):
+    user = models.ForeignKey(User)
+    catalog_layer = models.ForeignKey(CatalogLayer, related_name="related_user_set")
     style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
-
-    def as_dict(self):
-        return {'pk': self.pk,
-                'layer_name': self.layer.gs_name,
-                'label': self.layer.name,
-                'style_label': str(self.style),
-                'style_name': self.style.name,
-                'schema': self.layer.tableschema,
-                'workspace': self.layer.gs_workspace,
-                'created_at': str(self.layer.creation_time),
-                }
 
     class Meta:
         app_label = u'api'
