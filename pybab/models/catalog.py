@@ -27,8 +27,14 @@ class CatalogModel(GeoTreeModel):
         return type(self).__name__
 
     @property
+    def generic(self):
+        return Catalog.objects.get(pk=self.pk)
+
+    @property
     def elements(self):
-        return Catalog.objects.get(pk=self.pk).elements
+        return self.generic.elements 
+
+
     
     def to_dict(self):
         return {'id':self.id,
@@ -43,7 +49,9 @@ class CatalogModel(GeoTreeModel):
                 'tableschema':self.tableschema,
                 'tablename':self.tableschema,
                 'code_column':self.code_column,
-                'time_column':self.time_column}
+                'time_column':self.time_column,
+                'leaf':True,
+                'has_metadata':self.has_metadata}
 
     def __unicode__(self):
         return u'({id}, {name})'.format(id=self.id, name=self.name)
@@ -107,12 +115,12 @@ class CatalogIndicator(CatalogModel):
     gs_url = models.CharField(max_length=255)
 
     def to_json(self):
-        dict_temp = { 'data_column': self.data_column,
-                      'ui_palette':self.ui_palette,
-                      'ui_quartili':self.ui_quartili,
-                      'gs_name':self.gs_name,
-                      'gs_workspace':self.gs_workspace,
-                      'gs_url':self.url}
+        dict_temp = {'data_column': self.data_column,
+                     'ui_palette':self.ui_palette,
+                     'ui_quartili':self.ui_quartili,
+                     'gs_name':self.gs_name,
+                     'gs_workspace':self.gs_workspace,
+                     'gs_url':self.url}
         
         return dict_union(dict_temp,super(CatalogIndicator,self).to_json())
     
@@ -193,12 +201,12 @@ class CatalogLayer(CatalogModel):
         return pg_run(proc_name, args)
 
     def to_json(self):
-        dict_temp = { 'geom_column': self.geom_column,
-                      'ui_tip':self.ui_tip,
-                      'gs_name':self.gs_name,
-                      'gs_workspace':self.gs_workspace,
-                      'gs_url':self.gs_url,
-                      'gs_legend_url':self.gs_legend_url}
+        dict_temp = {'geom_column': self.geom_column,
+                     'ui_tip':self.ui_tip,
+                     'gs_name':self.gs_name,
+                     'gs_workspace':self.gs_workspace,
+                     'gs_url':self.gs_url,
+                     'gs_legend_url':self.gs_legend_url}
 
         return dict_union(dict_temp,super(CatalogIndicator,self).to_json())
 
@@ -242,6 +250,10 @@ class Catalog(GeoTreeModel):
     tablename = models.TextField(null=True) 
     code_column = models.TextField(null=True)
     time_column = models.TextField(null=True)
+
+    @property
+    def has_metadata(self):
+        return self.metadata_set.exists()
 
     @property
     def specific(self):

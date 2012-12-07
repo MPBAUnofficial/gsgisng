@@ -1,9 +1,7 @@
-from django.http import HttpResponseBadRequest
-
-from tojson import render_to_json
-
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.utils.translation import ugettext as _
 from pybab.models import CatalogIndicator, IndicatorGroup
-
+from tojson import render_to_json
 from .commons import login_required_json_default, get_subtree_for
 from ..forms import UserIndicatorLinkForm
 
@@ -22,6 +20,11 @@ def catalog_indicator(request, index):
             return {'success': True}
         else: 
             return {'success': False,
-                    'message': indicator_form.errors }, { 'cls': HttpResponseBadRequest}   
+                    'message': indicator_form.errors }, { 'cls': HttpResponseBadRequest}  
+    else:
+        error_msg = u"request type \"{req_type}\"is not supported".format(
+                req_type=request.method)
+        return {'success' : False,
+                'message' : _(error_msg)}, {'cls':HttpResponseForbidden} 
 
 
