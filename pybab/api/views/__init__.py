@@ -1,8 +1,9 @@
-__all__ = ['upload_layer','delete_layer','upload_layer','delete_style',
-           'layer_form', 'list_layers', 'list_styles',
+__all__ = ['catalog_layer',
+           #'delete_style', 'list_styles',
            'catalog_indicator',
            'catalog_statistical']
 
-from .layer_views import upload_layer,delete_layer,upload_style,delete_style,layer_form,list_layers,list_styles
+#from .layer_views import list_styles, delete_style
+from .new_layer_views import catalog_layer
 from .indicator_views import catalog_indicator 
 from .statistical_views import catalog_statistical

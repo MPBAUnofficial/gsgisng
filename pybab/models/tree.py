@@ -113,7 +113,8 @@ class Tree(GeoTreeModel):
 class Label(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
-    type = models.CharField(max_length=255)
+    type = models.CharField(max_length=255,default='default')
+    #TODO ovverride save to display enumeration fields
 
     def add_to_elements(self, elements, time_start=None, time_end=None):
         proc_name = u'gt_elements_add_label'
