@@ -6,7 +6,6 @@ from tojson import render_to_json
 from pybab.models import CatalogLayer, LayerGroup
 
 from .commons import login_required_json_default, get_subtree_for
-from ..models import UserLayerLink
 from ..forms import ShapeForm
 from ..layer_settings import MAX_LAYER_UPLOADS
 
@@ -50,15 +49,14 @@ def _delete_layer(user, index):
         return {'success':False,
                 'message': _(error_msg)}, {'cls':HttpResponseNotFound}
 
-    if catalog_layer.related_user_set.exists():
+    if not catalog_layer.related_user_set.exists():
         error_msg = u"layer with id '{}' is public, you can not delete it."
         return {'success':False,
                 'message': _(error_msg)}, {'cls':HttpResponseForbidden}
     else:
         try:
             catalog_layer.related_user_set.get(user=user)
-        #TODO: change with catalog_layer.related_user_set.DoesNotExist 
-        except UserLayerLink.DoesNotExist:
+        except catalog_layer.related_user_set.DoesNotExist:
             error_msg = u"layer with id '{}' does not belong to the current user."
             return {'success':False,
                     'message': _(error_msg)}, {'cls':HttpResponseForbidden}

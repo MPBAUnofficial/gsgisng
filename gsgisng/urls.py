@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^avatar/', include('avatar.urls')),
     # Shp uploader
-    url(r'^shape_uploader/', include('shp_uploader.urls')),
+    url(r'^api/', include('shp_uploader.urls')),
     # Django cms
     url(r'^', include('cms.urls')),
 )
