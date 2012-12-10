@@ -33,8 +33,6 @@ class CatalogModel(GeoTreeModel):
     @property
     def elements(self):
         return self.generic.elements 
-
-
     
     def to_dict(self):
         return {'id':self.id,
@@ -51,7 +49,7 @@ class CatalogModel(GeoTreeModel):
                 'code_column':self.code_column,
                 'time_column':self.time_column,
                 'leaf':True,
-                'has_metadata':self.has_metadata}
+                'has_metadata':self.generic.has_metadata}
 
     def __unicode__(self):
         return u'({id}, {name})'.format(id=self.id, name=self.name)
@@ -114,7 +112,7 @@ class CatalogIndicator(CatalogModel):
     gs_workspace = models.CharField(max_length=255, null=True)
     gs_url = models.CharField(max_length=255)
 
-    def to_json(self):
+    def to_dict(self):
         dict_temp = {'data_column': self.data_column,
                      'ui_palette':self.ui_palette,
                      'ui_quartili':self.ui_quartili,
@@ -122,7 +120,7 @@ class CatalogIndicator(CatalogModel):
                      'gs_workspace':self.gs_workspace,
                      'gs_url':self.url}
         
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_json())
+        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
     
     class Meta(CatalogModel.Meta):
         db_table = u'gt_catalog_indicator'
@@ -131,7 +129,7 @@ class IndicatorGroup(GroupModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     
-    def to_json(self):
+    def to_dict(self):
         return {'id':self.id,
                 'name':self.name}
     
@@ -153,9 +151,9 @@ class CatalogStatistical(CatalogModel):
     group = models.ForeignKey('StatisticalGroup', default=lambda:StatisticalGroup.objects.get(pk=0))
     data_column = models.TextField() 
     
-    def to_json(self):
+    def to_dict(self):
         dict_temp = { 'data_column': self.data_column}
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_json())
+        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table = u'gt_catalog_statistical'
@@ -164,7 +162,7 @@ class StatisticalGroup(GroupModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     
-    def to_json(self):
+    def to_dict(self):
         return {'id':self.id,
                 'name':self.name}
 
@@ -200,7 +198,7 @@ class CatalogLayer(CatalogModel):
         args = [self.pk, name_column, parent_column, elements_rank]
         return pg_run(proc_name, args)
 
-    def to_json(self):
+    def to_dict(self):
         dict_temp = {'geom_column': self.geom_column,
                      'ui_tip':self.ui_tip,
                      'gs_name':self.gs_name,
@@ -208,7 +206,7 @@ class CatalogLayer(CatalogModel):
                      'gs_url':self.gs_url,
                      'gs_legend_url':self.gs_legend_url}
 
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_json())
+        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table=u'gt_catalog_layer'
@@ -217,7 +215,7 @@ class LayerGroup(GroupModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     
-    def to_json(self):
+    def to_dict(self):
         return {'id':self.id,
                 'name':self.name}
 
