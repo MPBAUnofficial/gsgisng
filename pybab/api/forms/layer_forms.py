@@ -78,6 +78,16 @@ def _check_number_files(extension, zip):
         raise forms.ValidationError(msg)
 
 class ShapeForm(forms.ModelForm):
+    def __new__(cls, *args, **kwargs):
+        user = kwargs.get('user', None)
+        print user
+        if user is None:
+            style_queryset = UserStyle.objects
+        else:
+            style_queryset = user.userstyle_set
+        cls.base_fields["style"] = forms.ModelChoiceField(queryset=style_queryset)
+        return super(ShapeForm, cls).__new__(cls, *args, **kwargs)
+
     def __init__(self, *args, **kwargs):
         if "instance" not in kwargs:
             kwargs["instance"] = CatalogShape()
@@ -105,7 +115,6 @@ class ShapeForm(forms.ModelForm):
 
 
     epsg_code = forms.IntegerField(label="EPSG:")
-    style = forms.ModelChoiceField(queryset=UserStyle.objects.all())
     shape_zip = forms.FileField()
 
     def clean(self):
@@ -168,17 +177,16 @@ class ShapeForm(forms.ModelForm):
 
         catalogLayer.tablename = self.layer_id
         catalogLayer.gs_name = self.layer_id
-        catalogLayer.layer_group = LayerGroup.objects.get(pk=0)
 
-        #shuold be if commit. It is forced to commit in order to create
-        #the userLayer that is related to it
-        if True:
+        if commit:
             catalogLayer.save()
+            #update the UserLayerLink related to this CatalogLayer
             try:
-                userLayer = UserLayerLink.objects.get(layer=catalogLayer)
+                userLayer = UserLayerLink.objects.get(
+                    catalog_layer=catalogLayer)
             except UserLayerLink.DoesNotExist:
                 userLayer = UserLayerLink()
-            userLayer.layer = catalogLayer
+            userLayer.catalog_layer = catalogLayer
             userLayer.style = self.cleaned_data["style"]
             userLayer.user = self.user
             userLayer.save()

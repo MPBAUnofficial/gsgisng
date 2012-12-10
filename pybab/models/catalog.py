@@ -104,7 +104,7 @@ class ElementCatalogLink(GeoTreeModel):
 # ===========================================================================
 
 class CatalogIndicator(CatalogModel):
-    group = models.ForeignKey('IndicatorGroup', default=lambda:IndicatorGroup.objects.get(pk=0))
+    group = models.ForeignKey('IndicatorGroup', default=lambda:IndicatorGroup.objects.get(pk=1))
     data_column = models.TextField() 
     ui_palette = models.CharField(max_length=255, null=True)
     ui_quartili = models.TextField(null=True)
@@ -148,7 +148,7 @@ class IndicatorTree(GeoTreeModel):
 # ===========================================================================
 
 class CatalogStatistical(CatalogModel):
-    group = models.ForeignKey('StatisticalGroup', default=lambda:StatisticalGroup.objects.get(pk=0))
+    group = models.ForeignKey('StatisticalGroup', default=lambda:StatisticalGroup.objects.get(pk=1))
     data_column = models.TextField() 
     
     def to_dict(self):
@@ -182,7 +182,7 @@ class StatisticalTree(GeoTreeModel):
 # ===========================================================================
 
 class CatalogLayer(CatalogModel):
-    group = models.ForeignKey('LayerGroup', default=lambda:LayerGroup.objects.get(pk=0))
+    group = models.ForeignKey('LayerGroup', default=lambda:LayerGroup.objects.get(pk=1))
     geom_column = models.TextField(null=True)
     ui_qtip = models.CharField(max_length=255, null=True)
     gs_name = models.CharField(max_length=255,
@@ -200,13 +200,13 @@ class CatalogLayer(CatalogModel):
 
     def to_dict(self):
         dict_temp = {'geom_column': self.geom_column,
-                     'ui_tip':self.ui_tip,
+                     'ui_qtip':self.ui_qtip,
                      'gs_name':self.gs_name,
                      'gs_workspace':self.gs_workspace,
                      'gs_url':self.gs_url,
                      'gs_legend_url':self.gs_legend_url}
 
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
+        return dict_union(dict_temp,super(CatalogLayer, self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table=u'gt_catalog_layer'
