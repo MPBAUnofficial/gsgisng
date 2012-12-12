@@ -80,12 +80,14 @@ def _check_number_files(extension, zip):
 class ShapeForm(forms.ModelForm):
     def __new__(cls, *args, **kwargs):
         user = kwargs.get('user', None)
-        print user
+
         if user is None:
             style_queryset = UserStyle.objects
         else:
-            style_queryset = user.userstyle_set
-        cls.base_fields["style"] = forms.ModelChoiceField(queryset=style_queryset)
+            style_queryset = user.userstyle_set.all() | \
+                                  UserStyle.objects.filter(user__isnull=True)
+        cls.base_fields["style"] = forms.ModelChoiceField(
+            queryset=style_queryset)
         return super(ShapeForm, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, *args, **kwargs):
