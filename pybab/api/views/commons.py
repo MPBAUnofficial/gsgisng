@@ -1,18 +1,21 @@
 from django.http import HttpResponseNotFound
 from django.utils.translation import ugettext as _
 
+from pybab.commons import dict_join
 from tojson import login_required_json
 
 from ..models import get_system_catalogs, get_user_catalogs
 
-def _add_to_dicts( dict_list, key, value ):
-    new_dict_list = [d.copy() for d in dict_list]
-    for d in new_dict_list:
-        d[key]=value
+def _to_dict(model_instance, *args):
+    result = model_instance.to_dict()
+    for arg in args:
+        if callable(arg):
+            result.update(arg(model_instance))
+        else:
+            result.update(arg)
+    return result
 
-    return new_dict_list 
-
-def get_subtree_for(user, group_index, group_class, catalog_class):
+def get_subtree_for(user, group_index, group_class, catalog_class, extra_data=None):
     """
     Given a user and a tree index, it return all the json to send to the client.
     """
@@ -23,11 +26,13 @@ def get_subtree_for(user, group_index, group_class, catalog_class):
                 'message':'{} is not a valid index for {}'.format(group_index, group_class.__name__)},\
                {'cls': HttpResponseNotFound}
 
-    folders = [f.to_dict() for f in root.children]
-    public_catalogs = _add_to_dicts(
-            [cat.to_dict() for cat in get_system_catalogs(catalog_class, group_index)], 'public', True)
-    private_catalogs = _add_to_dicts(
-            [cat.to_dict() for cat in get_user_catalogs(user, catalog_class, group_index)], 'public', False)
+    folders = [dict_join(f.to_dict(), {'leaf':False}) for f in root.children]
+
+    public_catalogs = [_to_dict(cat, {'leaf':True, 'public':True}, *extra_data)
+            for cat in get_system_catalogs(catalog_class, group_index)]
+
+    private_catalogs = [_to_dict(cat, {'leaf':True,'public':False}, *extra_data)
+            for cat in get_user_catalogs(user, catalog_class, group_index)]
 
     return {'success':'true',
             'requested':root.to_dict(),
