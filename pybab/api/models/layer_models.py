@@ -81,7 +81,7 @@ def style_update_handler(sender, **kwargs):
             pass
 
 class UserLayerLink(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     catalog_layer = models.ForeignKey(CatalogLayer,
                                       related_name="related_user_set")
     style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
