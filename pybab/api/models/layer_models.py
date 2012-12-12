@@ -29,29 +29,28 @@ class UserStyle(models.Model):
         }
 
     #if None, the style is for all the users
-    user = models.ForeignKey(User, null=True, blank=True,
-                             help_text=_(u"Leave blank to assign this"
+    user = models.ForeignKey(User, null=True,
+                             help_text=_(u"Leave void to assign this"
                                          " style to all the users"))
-    name = models.CharField(max_length=200,
+    name = models.CharField(max_length=200, unique=True,
                             verbose_name=_(u"Geoserver style name"),
                             help_text=_(u"Automatically generated"))
     label = models.CharField(max_length=200, verbose_name=_(u"Style Name"))
     xml = models.TextField()
     feature_type = models.CharField(max_length=2,
                                     choices=FEATURE_TYPES.items())
-    created_at = models.DateTimeField(auto_now_add = True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return self.label
+        return u"({}, {})".format(self.id, self.label)
 
-    def as_dict(self):
-        return {'pk': self.pk,
+    def to_dict(self):
+        return {'id': self.pk,
                 'style_name': self.name,
                 'label': self.label,
                 'xml': self.xml,
                 'feature_type': self.FEATURE_TYPES[self.feature_type],
-                'created_at': str(self.created_at),
-                }
+                'created_at': self.created_at.isoformat()}
 
     class Meta:
         app_label = u'api'
@@ -83,7 +82,8 @@ def style_update_handler(sender, **kwargs):
 
 class UserLayerLink(models.Model):
     user = models.ForeignKey(User)
-    catalog_layer = models.ForeignKey(CatalogLayer, related_name="related_user_set")
+    catalog_layer = models.ForeignKey(CatalogLayer,
+                                      related_name="related_user_set")
     style = models.ForeignKey(UserStyle, on_delete=models.PROTECT)
 
     class Meta:
