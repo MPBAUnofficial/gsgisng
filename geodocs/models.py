@@ -30,7 +30,7 @@ class Point(models.Model):
     degree = models.IntegerField(_('degree'), choices=DEGREE_CHOICES)
     topic = models.CharField(_('argomento'), choices=TOPIC_CHOICES,
                              max_length=63)
-    address = models.CharField(_('address'), max_length=511)
+    address = models.CharField(_('address'), max_length=511, blank=True)
     lon = models.FloatField(_('longitude'), validators=_lon_validators)
     lat = models.FloatField(_('latitude'), validators=_lat_validators)
     created = models.DateTimeField(_('creation time'), auto_now_add=True,
