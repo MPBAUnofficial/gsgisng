@@ -137,6 +137,10 @@ body {
 .logo {
 	float: left;
 }
+.lang{
+    position: absolute;
+    top: 45px;
+}
 a {
 	text-decoration: none;
 	color: #e64135;
@@ -478,11 +482,12 @@ small {
 	height: auto;
 	padding: 25px 0 20px 0;
 }
-h2.intro {
+div.intro p {
 	color: #989898;
 	line-height: 33px;
 	margin-bottom: 42px;
 	font-family: 'Museo300';
+    font-size: 24px;
 }
 #footer {
 	background-color: #e64135;
@@ -532,6 +537,9 @@ h2.intro {
 	background-color: #FFF;
 	font-size: 10px;
 	padding:10px 0;
+}
+.copyright div {
+    text-align: center;
 }
 #footer ul.list {
 	list-style: none;

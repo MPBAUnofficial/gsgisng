@@ -3,8 +3,14 @@
 
 {% block page_content %}
 <form method="post" action=".">
-    {{ form.as_p }}
+  <table style="width:auto">
+    {{ form.as_table }}
+    <tr>
+      <td colspan=2>
+        <input type="submit" value="{% trans 'Submit' %}" />
+      </td>
+    </tr>
+  </table>
     {% csrf_token %}
-  <input type="submit" value="{% trans 'Submit' %}" />
 </form>
 {% endblock %}
