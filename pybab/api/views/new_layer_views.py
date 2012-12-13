@@ -25,7 +25,7 @@ def catalog_layer(request, index=0):
                 ret_dict['style'] = instance.related_user_set.all()[0].style.name
             return ret_dict
         return get_subtree_for(user, int(index), LayerGroup,
-                               CatalogLayer, extra_data=(get_style,))
+                CatalogLayer, extra_data=(get_style,{'checked':True}))
     elif request.method == 'POST':
         return _upload_layer(request, user, index)
     elif request.method == 'DELETE':

@@ -11,7 +11,7 @@ from ..forms import UserIndicatorLinkForm
 def catalog_indicator(request, index):
     user = request.user
     if request.method == 'GET':
-        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator)
+        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator, extra_data=({'checked':True},))
     elif request.method == 'POST':
         indicator_form = UserIndicatorLinkForm(request.POST)
     
