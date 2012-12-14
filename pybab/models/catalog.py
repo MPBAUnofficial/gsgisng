@@ -1,7 +1,8 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
 from .tree import Element
-from .commons import GeoTreeModel, GeoTreeError, pg_run, dict_union
+from .commons import GeoTreeModel, GeoTreeError, pg_run
+from ..commons import dict_join
 
 # ===========================================================================
 # Utilities
@@ -39,16 +40,10 @@ class CatalogModel(GeoTreeModel):
                 'name':self.name,
                 'creation_time':self.creation_time.isoformat(),
                 'numcode':self.numcode,
-                'remotehost':self.remotehost,
-                'remoteport':self.remoteport,
-                'remotedb':self.remotedb,
-                'remoteuser':self.remoteuser,
-                'remotepass':self.remotepass,
                 'tableschema':self.tableschema,
                 'tablename':self.tableschema,
                 'code_column':self.code_column,
                 'time_column':self.time_column,
-                'leaf':True,
                 'has_metadata':self.generic.has_metadata}
 
     def __unicode__(self):
@@ -77,8 +72,7 @@ class GroupModel(GeoTreeModel):
 
     def to_dict(self):
         return {'id':self.id,
-                'name':self.name,
-                'leaf':False}
+                'name':self.name}
 
     def __unicode__(self):
         return u'({id}, {name})'.format(id=self.id, name=self.name)
@@ -120,7 +114,7 @@ class CatalogIndicator(CatalogModel):
                      'gs_workspace':self.gs_workspace,
                      'gs_url':self.url}
         
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
+        return dict_join(dict_temp,super(CatalogIndicator,self).to_dict())
     
     class Meta(CatalogModel.Meta):
         db_table = u'gt_catalog_indicator'
@@ -153,7 +147,7 @@ class CatalogStatistical(CatalogModel):
     
     def to_dict(self):
         dict_temp = { 'data_column': self.data_column}
-        return dict_union(dict_temp,super(CatalogIndicator,self).to_dict())
+        return dict_join(dict_temp,super(CatalogIndicator,self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table = u'gt_catalog_statistical'
@@ -206,7 +200,7 @@ class CatalogLayer(CatalogModel):
                      'gs_url':self.gs_url,
                      'gs_legend_url':self.gs_legend_url}
 
-        return dict_union(dict_temp,super(CatalogLayer, self).to_dict())
+        return dict_join(dict_temp,super(CatalogLayer, self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table=u'gt_catalog_layer'
@@ -276,18 +270,13 @@ class Catalog(GeoTreeModel):
                 'name':self.name,
                 'creation_time':self.creation_time.isoformat(),
                 'numcode':self.numcode,
-                'remotehost':self.remotehost,
-                'remoteport':self.remoteport,
-                'remotedb':self.remotedb,
-                'remoteuser':self.remoteuser,
-                'remotepass':self.remotepass,
                 'tableschema':self.tableschema,
                 'tablename':self.tableschema,
                 'code_column':self.code_column,
                 'time_column':self.time_column}
 
     def __unicode__(self):
-        return self.name
+        return u"({}, {})".format(self.id, self.name)
 
     class Meta(GeoTreeModel.Meta):
         db_table = u'gt_catalog'

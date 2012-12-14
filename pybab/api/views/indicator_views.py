@@ -8,10 +8,11 @@ from ..forms import UserIndicatorLinkForm
 
 @login_required_json_default
 @render_to_json()
-def catalog_indicator(request, index):
+def catalog_indicator(request, index=0):
     user = request.user
     if request.method == 'GET':
-        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator, extra_data=({'checked':False},))
+        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator,
+                use_checked=True)
     elif request.method == 'POST':
         indicator_form = UserIndicatorLinkForm(request.POST)
     

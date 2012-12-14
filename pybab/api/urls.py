@@ -1,8 +1,9 @@
 from django.conf.urls import patterns, url#, include
 
 urlpatterns = patterns('pybab.api',
-#    url(r'^styles/$', 'views.upload_style'),
-#    url(r'^styles/delete/(?P<pk>\d+)/$', 'views.delete_style'),
+    #styles
+    url(r'^styles/$', 'views.styles'),
+    url(r'^styles/delete/(?P<index>\d+)/$', 'views.styles'),
     # catalog layer
     url(r'^layer/$', 'views.catalog_layer'),
     url(r'^layer/(?P<index>\d+)/$', 'views.catalog_layer'),
