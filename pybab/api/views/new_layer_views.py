@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 #TODO: remove exempt
 @csrf_exempt
 @login_required_json_default
-@render_to_json()
+@render_to_json(mimetype='text/html')
 def catalog_layer(request, index=0):
     user = request.user
 

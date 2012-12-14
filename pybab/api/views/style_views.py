@@ -1,19 +1,20 @@
+from functools import partial
 from django.db import models
 from django.http import HttpResponseForbidden, \
         HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
 
 from tojson import render_to_json
+from pybab.commons import dict_join
 
-from .commons import login_required_json_default, add_to_dicts
+from .commons import login_required_json_default
 from ..layer_settings import MAX_STYLE_UPLOADS
 from ..models import UserStyle
 
 from ..forms import UserStyleForm
 
-from django.views.decorators.csrf import csrf_exempt
-#TODO: remove exempt
-@csrf_exempt
+add_to_dicts = lambda l, d:list(map(partial(dict_join, d), l))
+
 @login_required_json_default
 @render_to_json()
 def styles(request, index=0):
