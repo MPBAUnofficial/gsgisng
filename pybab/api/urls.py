@@ -3,7 +3,7 @@ from django.conf.urls import patterns, url#, include
 urlpatterns = patterns('pybab.api',
     #styles
     url(r'^styles/$', 'views.styles'),
-    url(r'^styles/delete/(?P<index>\d+)/$', 'views.styles'),
+    url(r'^styles/(?P<index>\d+)/$', 'views.styles'),
     # catalog layer
     url(r'^layer/$', 'views.catalog_layer'),
     url(r'^layer/(?P<index>\d+)/$', 'views.catalog_layer'),
