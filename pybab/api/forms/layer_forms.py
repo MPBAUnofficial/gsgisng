@@ -109,7 +109,7 @@ class ShapeForm(forms.ModelForm):
                 layer_settings.SCHEMA_ADMIN_UPLOADS
             kwargs["instance"].gs_workspace = \
                 layer_settings.WORKSPACE_ADMIN_UPLOADS
-        kwargs["instance"].gs_url = layer_settings.GEOSERVER_URL
+        kwargs["instance"].gs_url = layer_settings.GEOSERVER_PUBLIC_PATH
         kwargs["instance"].geom_column = "wkb_geometry"
         kwargs["instance"].layergroup = LayerGroup.objects.get(pk=0)
 

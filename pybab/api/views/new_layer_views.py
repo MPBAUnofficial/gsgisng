@@ -7,15 +7,16 @@ from pybab.models import CatalogLayer, LayerGroup
 
 from .commons import login_required_json_default, get_subtree_for
 from ..forms import ShapeForm
-from ..layer_settings import MAX_LAYER_UPLOADS
+from ..layer_settings import MAX_LAYER_UPLOADS, MAX_LAYER_GROUPS
 
 from django.views.decorators.csrf import csrf_exempt
 #TODO: remove exempt
 @csrf_exempt
 @login_required_json_default
-@render_to_json()
+@render_to_json(mimetype='text/html')
 def catalog_layer(request, index=0):
     user = request.user
+    index = int(index)
 
     if request.method == 'GET':
         def get_style(instance):
@@ -24,10 +25,15 @@ def catalog_layer(request, index=0):
                 #unique force this to be only one
                 ret_dict['style'] = instance.related_user_set.all()[0].style.name
             return ret_dict
-        return get_subtree_for(user, int(index), LayerGroup,
-                CatalogLayer, extra_data=(get_style,{'checked':False}))
+
+        def alter_id(instance):
+            return {'id':instance.id*MAX_LAYER_GROUPS,
+                    'real_id':instance.id}
+
+        return get_subtree_for(user, index, LayerGroup, CatalogLayer,
+                extra_data=(get_style, alter_id, {'checked':False}))
     elif request.method == 'POST':
-        return _upload_layer(request, user, index)
+        return _upload_layer(request, user)
     elif request.method == 'DELETE':
         return _delete_layer(user, index)
     else:
@@ -36,7 +42,7 @@ def catalog_layer(request, index=0):
         return {'success' : False,
                 'message' : _(error_msg)}, {'cls':HttpResponseForbidden}
 
-def _upload_layer(request, user, index):
+def _upload_layer(request, user):
     if user.userlayerlink_set.count() > MAX_LAYER_UPLOADS:
         error_msg = u"too many layers uploaded. max number is {}".format(
                 MAX_LAYER_UPLOADS)
@@ -52,26 +58,27 @@ def _upload_layer(request, user, index):
 
 
 def _delete_layer(user, index):
+    real_id = index / MAX_LAYER_GROUPS
     try:
-        catalog_layer = CatalogLayer.objects.get(pk=index)
+        catalog_layer = CatalogLayer.objects.get(pk=real_id)
     except CatalogLayer.DoesNotExist:
-        error_msg = u"layer with id '{}' does not exist".format(index)
+        error_msg = _(u"layer with id '%s' does not exist") % (real_id)
         return {'success':False,
-                'message': _(error_msg)}, {'cls':HttpResponseNotFound}
+                'message': error_msg}, {'cls':HttpResponseNotFound}
 
     if not catalog_layer.related_user_set.exists():
         error_msg = _(u"layer with id '%s' is public,"
-                      u"you can not delete it.") % (index)
+                      u"you can not delete it.") % (real_id)
         return {'success':False,
-                'message': _(error_msg)}, {'cls':HttpResponseForbidden}
+                'message': error_msg}, {'cls':HttpResponseForbidden}
     else:
         try:
             catalog_layer.related_user_set.get(user=user)
         except catalog_layer.related_user_set.DoesNotExist:
             error_msg = _(u"layer with id '%s' does not belong"
-                          u"to the current user.") % (index)
+                          u"to the current user.") % (real_id)
             return {'success':False,
-                    'message': _(error_msg)}, {'cls':HttpResponseForbidden}
+                    'message': error_msg}, {'cls':HttpResponseForbidden}
         #This will also delete UserLayerLink as a result of the CASCADE trigger.
         catalog_layer.delete()
         return {'success':True}

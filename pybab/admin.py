@@ -2,7 +2,6 @@ from django.contrib import admin
 from forms import NodeChoiceField
 from .models import Element, CatalogLayer, CatalogStatistical, CatalogIndicator, LayerGroup
 
-
 class CatalogChangeList(ChangeList):
     def get_query_set(self, request=None):
         qs = super(CatalogChangeList, self).get_query_set(request)

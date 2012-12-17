@@ -122,12 +122,3 @@ class AdditionalData(object):
             related_object.additional_data._add_from_model(model, mapping)
             result.append(related_object)
         return result
-
-# ===========================================================================
-# Catalog common utils
-# ===========================================================================
-
-def dict_union(dict1, dict2):
-    dict_temp = dict1.copy()
-    dict_temp.update(dict2)
-    return dict_temp
