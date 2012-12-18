@@ -1,33 +1,117 @@
 from django.contrib import admin
-from forms import NodeChoiceField
-from .models import Element, CatalogLayer, CatalogStatistical, CatalogIndicator, LayerGroup
+from django.contrib.admin.views.main import ChangeList
+from .forms import LayerGroupForm, IndicatorGroupForm, StatisticalGroupForm
+from .forms import CatalogLayerForm, CatalogIndicatorForm, CatalogStatisticalForm
+from django import forms
+from .models import Element, CatalogLayer, CatalogStatistical, CatalogIndicator
+from .models import LayerGroup, IndicatorGroup, StatisticalGroup
 
-class CatalogChangeList(ChangeList):
-    def get_query_set(self, request=None):
-        qs = super(CatalogChangeList, self).get_query_set(request)
+class LayerChangeList(ChangeList):
+    def results(self):
+        return LayerGroup.objects.tree_sorted_levels()
 
-        # always order by (tree_id, left)
-        #trova qualche tipo di ordinamento
-        return qs#.order_by(tree_id, left)
+class LayerGroupAdmin(admin.ModelAdmin):
+    form = LayerGroupForm
 
+    def get_changelist(self,request, **kwargs):
+        return LayerChangeList
 
-class CatalogModelAdmin(ModelAdmin):
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        dict(form_class=NodeChoiceField,
-             queryset=db_field.rel.to.objects.all(),
-             required=False)
-        defaults.update(kwargs)
-        kwargs = defaults
-        return super(CatalogModelAdmin, self).\
-            formfield_for_foreignkey(db_field,
-                                     request,
-                                     **kwargs)
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(LayerGroupAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['parent'].choices=\
+            LayerGroup.objects.subtree_sorted_indented(
+                parent=LayerGroup.objects.get(id=LayerGroup.ROOT_ID),
+                to_exclude=(obj,)
+                )
+        if obj:
+            form.base_fields['parent'].initial = obj.parent.id
+        return form
 
-    def get_changelist(self, request, **kwargs):
-        return CatalogChangeList
+class IndicatorChangeList(ChangeList):
+    def results(self):
+        return IndicatorGroup.objects.tree_sorted_levels()
+
+class IndicatorGroupAdmin(admin.ModelAdmin):
+    form = IndicatorGroupForm
+
+    def get_changelist(self,request, **kwargs):
+        return IndicatorChangeList
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(IndicatorGroupAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['parent'].choices=\
+            IndicatorGroup.objects.subtree_sorted_indented(
+                parent=IndicatorGroup.objects.get(id=IndicatorGroup.ROOT_ID),
+                to_exclude=(obj,)
+                )
+        if obj:
+            form.base_fields['parent'].initial = obj.parent.id
+        return form
+
+class StatisticalChangeList(ChangeList):
+    def results(self):
+        return StatisticalGroup.objects.tree_sorted_levels()
+
+class StatisticalGroupAdmin(admin.ModelAdmin):
+    form = StatisticalGroupForm
+
+    def get_changelist(self,request, **kwargs):
+        return StatisticalChangeList
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(StatisticalGroupAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['parent'].choices=\
+            StatisticalGroup.objects.subtree_sorted_indented(
+                parent=StatisticalGroup.objects.get(id=StatisticalGroup.ROOT_ID),
+                to_exclude=(obj,)
+                )
+        if obj:
+            form.base_fields['parent'].initial = obj.parent.id
+        return form
+
+class CatalogLayerAdmin(admin.ModelAdmin):
+    form = CatalogLayerForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(CatalogLayerAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['group'].choices=\
+            LayerGroup.objects.subtree_sorted_indented(
+                parent=LayerGroup.objects.get(id=LayerGroup.ROOT_ID),
+                )
+        if obj:
+            form.base_fields['group'].initial = obj.group
+        return form
+
+class CatalogStatisticalAdmin(admin.ModelAdmin):
+    form = CatalogStatisticalForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(CatalogStatisticalAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['group'].choices=\
+            StatisticalGroup.objects.subtree_sorted_indented(
+                parent=StatisticalGroup.objects.get(id=StatisticalGroup.ROOT_ID),
+                )
+        if obj:
+            form.base_fields['group'].initial = obj.group
+        return form
+
+class CatalogIndicatorAdmin(admin.ModelAdmin):
+    form = CatalogIndicatorForm
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(CatalogIndicatorAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['group'].choices=\
+            IndicatorGroup.objects.subtree_sorted_indented(
+                parent=IndicatorGroup.objects.get(id=IndicatorGroup.ROOT_ID),
+                )
+        if obj:
+            form.base_fields['group'].initial = obj.group
+        return form
 
 admin.site.register(Element)
-admin.site.register(CatalogLayer)
-admin.site.register(CatalogStatistical)
-admin.site.register(CatalogIndicator)
-admin.site.register(LayerGroup, CatalogModelAdmin)
+admin.site.register(CatalogLayer, CatalogLayerAdmin)
+admin.site.register(CatalogStatistical, CatalogStatisticalAdmin)
+admin.site.register(CatalogIndicator, CatalogIndicatorAdmin)
+admin.site.register(LayerGroup, LayerGroupAdmin)
+admin.site.register(IndicatorGroup, IndicatorGroupAdmin)
+admin.site.register(StatisticalGroup, StatisticalGroupAdmin)

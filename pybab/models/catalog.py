@@ -1,8 +1,10 @@
 from django.contrib.gis.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ObjectDoesNotExist
 from .tree import Element
 from .commons import GeoTreeModel, GeoTreeError, pg_run
 from ..commons import dict_join
+from ..managers import GroupModelManager
 
 # ===========================================================================
 # Utilities
@@ -18,11 +20,11 @@ class CatalogModel(GeoTreeModel):
     remotedb = models.CharField(max_length=255, null=True)
     remoteuser = models.CharField(max_length=255, null=True)
     remotepass = models.CharField(max_length=255, null=True)
-    tableschema = models.TextField(null=True) 
-    tablename = models.TextField(null=True) 
+    tableschema = models.TextField(null=True)
+    tablename = models.TextField(null=True)
     code_column = models.TextField(null=True)
     time_column = models.TextField(null=True)
-    
+
     @property
     def catalog_type(self):
         return type(self).__name__
@@ -33,8 +35,8 @@ class CatalogModel(GeoTreeModel):
 
     @property
     def elements(self):
-        return self.generic.elements 
-    
+        return self.generic.elements
+
     def to_dict(self):
         return {'id':self.id,
                 'name':self.name,
@@ -54,6 +56,9 @@ class CatalogModel(GeoTreeModel):
 
 class GroupModel(GeoTreeModel):
     ROOT_ID = 0
+
+    objects = GroupModelManager()
+
     @property
     def is_root(self):
         return self.pk == GroupModel.ROOT_ID
@@ -64,6 +69,16 @@ class GroupModel(GeoTreeModel):
             return None
         else:
             return type(self).objects.get(parent_tree__group=self)
+
+    @parent.setter
+    def parent(self, newparent):
+        if self.is_root:
+            raise NonToccarmiLaRootOMuori
+        elif self.pk is None:
+            raise Exception('Can not set parent for unsaved objects')
+        else:
+            self.child_tree.all().delete()
+            self.child_tree.create(group=self, parent_group=newparent)
 
     @property
     def children(self):
@@ -88,8 +103,8 @@ class ElementCatalogLink(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     gt_element = models.ForeignKey(Element, related_name="catalog_link_elements")
     gt_catalog_id = models.ForeignKey('Catalog')
-    
-    
+
+
     class Meta(GeoTreeModel.Meta):
         db_table = u'gt_element_catalog_link'
 
@@ -216,7 +231,8 @@ class LayerGroup(GroupModel):
     class Meta(GroupModel.Meta):
         db_table=u'gt_layer_group'
 
-class LayerTree(GroupModel):
+#WAS: class LayerTree(GroupModel):
+class LayerTree(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     group = models.ForeignKey(LayerGroup, unique=True, related_name="child_tree")
     parent_group = models.ForeignKey(LayerGroup, related_name="parent_tree")
