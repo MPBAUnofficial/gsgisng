@@ -219,6 +219,10 @@ CMS_TEMPLATES = (
 #Django registration
 ACCOUNT_ACTIVATION_DAYS = 7
 LOGIN_REDIRECT_URL="/"
+
+#Email
+#EMAIL_HOST = 'mailhost.fbk.eu'
+#DEFAULT_FROM_EMAIL = 'registrazione@fbk.eu'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

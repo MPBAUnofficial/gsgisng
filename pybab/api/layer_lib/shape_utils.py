@@ -36,7 +36,7 @@ def _upload2pg(dir, schema, epsg_code):
     #maybe better to use a system with ogr2ogr?
     args = ['ogr2ogr.py',
         '-f', 'PostgreSQL',
-        'PG:host={} user={} dbname={} password={} active_schema={}\
+        'PG:host={0} user={1} dbname={2} password={3} active_schema={4}\
         '.format(db_conf['HOST'],db_conf['USER'],db_conf['NAME'],
                  db_conf['PASSWORD'],schema),
         '-a_srs', 'EPSG:'+str(epsg_code),

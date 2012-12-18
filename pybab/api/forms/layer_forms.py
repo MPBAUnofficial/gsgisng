@@ -154,7 +154,7 @@ class ShapeForm(forms.ModelForm):
         shutil.rmtree(dir)
         if not res==True:
             msg = "Failed to store the layer in postgis."
-            msg += "Check the EPSG code {} and if the shape is valid.".format(
+            msg += "Check the EPSG code {0} and if the shape is valid.".format(
                 self.cleaned_data['epsg_code'])
             raise forms.ValidationError(msg)
         else:
