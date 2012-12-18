@@ -3,6 +3,7 @@ from django.contrib import admin
 from pybab.api.models import UserStyle, CatalogShape
 from pybab.api.models import UserStatisticalLink
 from forms import ShapeForm, UserStyleForm
+from pybab.models import CatalogLayer
 
 class AdminStyleForm(UserStyleForm):
     is_public = forms.BooleanField(label="Public", required=False)

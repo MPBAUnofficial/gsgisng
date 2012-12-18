@@ -4,9 +4,16 @@
 
 {% block page_content %}
 <form method="post" action=".">
-    {{ form.as_p }}
     {% csrf_token %}
+    <table style="width:auto">
+        {{ form.as_table }}
+        <tr>
+            <td colspan=2>
+                <input type="submit" value="{% trans 'Login' %}" />
+            </td>
+        </tr>
+    </table>
     <p><a href="{% url "auth_password_reset" %}">{% trans "Forgot your password?" %}</a></p>
-    <input type="submit" value="{% trans 'Login' %}" />
+
 </form>
 {% endblock %}
