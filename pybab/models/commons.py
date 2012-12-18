@@ -59,9 +59,9 @@ class GeoTreeError(DatabaseError):
 
 class GeoTreeModel(models.Model):
 
-    def save(self,force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         try:
-            super(GeoTreeModel, self).save(force_insert=force_insert, force_update=force_update)
+            super(GeoTreeModel, self).save(*args, **kwargs)
         except DatabaseError as dberr:
             raise GeoTreeError.from_database_error(dberr)
 
