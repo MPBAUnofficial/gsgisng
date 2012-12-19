@@ -9,7 +9,7 @@ def my_callback(sender, **kwargs):
     print "Setting up pybab.api ..."
     for schema in (layer_settings.SCHEMA_USER_UPLOADS,
                    layer_settings.SCHEMA_ADMIN_UPLOADS):
-        query = "CREATE SCHEMA {};".format(schema)
+        query = "CREATE SCHEMA {0};".format(schema)
         with transaction.commit_on_success():
             try:
                 cursor.execute(query)

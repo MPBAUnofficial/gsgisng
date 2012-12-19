@@ -66,12 +66,12 @@ def _delete_style(pk):
         style = UserStyle.objects.get(pk=pk)
     except UserStyle.DoesNotExist:
         return ({'success': False,
-                 'message': 'Style {} does not exist'.format(pk)},
+                 'message': 'Style {0} does not exist'.format(pk)},
                 {'cls': HttpResponseNotFound})
     try:
         style.delete()
     except models.ProtectedError as e:
-        msg = ("Cannot delete the style '{}' because "
+        msg = ("Cannot delete the style '{0}' because "
                "it is associate to the following layer: ").format(style.label)
         msg += " ".join(["'"+s.layer.name+"'" for s in style.userlayerlink_set.all()])
         return ({'success': False,

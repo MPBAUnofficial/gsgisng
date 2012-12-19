@@ -23,7 +23,7 @@ def get_subtree_for(user, group_index, group_class, catalog_class, extra_data=No
         root = group_class.objects.get(pk=group_index)
     except group_class.DoesNotExist:
         return {'success':'false',
-                'message':'{} is not a valid index for {}'.format(group_index, group_class.__name__)},\
+                'message':'{0} is not a valid index for {1}'.format(group_index, group_class.__name__)},\
                {'cls': HttpResponseNotFound}
 
     folders = [dict_join(f.to_dict(), {'leaf':False}) for f in root.children]
