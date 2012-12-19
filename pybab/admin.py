@@ -23,7 +23,7 @@ class LayerGroupAdmin(admin.ModelAdmin):
                 parent=LayerGroup.objects.get(id=LayerGroup.ROOT_ID),
                 to_exclude=(obj,)
                 )
-        if obj:
+        if obj and obj.parent:
             form.base_fields['parent'].initial = obj.parent.id
         return form
 
@@ -44,7 +44,7 @@ class IndicatorGroupAdmin(admin.ModelAdmin):
                 parent=IndicatorGroup.objects.get(id=IndicatorGroup.ROOT_ID),
                 to_exclude=(obj,)
                 )
-        if obj:
+        if obj and obj.parent:
             form.base_fields['parent'].initial = obj.parent.id
         return form
 
@@ -65,7 +65,7 @@ class StatisticalGroupAdmin(admin.ModelAdmin):
                 parent=StatisticalGroup.objects.get(id=StatisticalGroup.ROOT_ID),
                 to_exclude=(obj,)
                 )
-        if obj:
+        if obj and obj.parent:
             form.base_fields['parent'].initial = obj.parent.id
         return form
 
