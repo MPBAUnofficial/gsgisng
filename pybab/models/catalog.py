@@ -15,15 +15,15 @@ class CatalogModel(GeoTreeModel):
     name = models.CharField(max_length=255)
     creation_time = models.DateTimeField(auto_now_add=True)
     numcode = models.IntegerField(default=0)
-    remotehost = models.CharField(max_length=255, null=True)
-    remoteport = models.IntegerField(null=True)
-    remotedb = models.CharField(max_length=255, null=True)
-    remoteuser = models.CharField(max_length=255, null=True)
-    remotepass = models.CharField(max_length=255, null=True)
-    tableschema = models.TextField(null=True)
-    tablename = models.TextField(null=True)
-    code_column = models.TextField(null=True)
-    time_column = models.TextField(null=True)
+    remotehost = models.CharField(max_length=255, blank=True, null=True)
+    remoteport = models.IntegerField(blank=True, null=True)
+    remotedb = models.CharField(max_length=255, blank=True, null=True)
+    remoteuser = models.CharField(max_length=255, blank=True, null=True)
+    remotepass = models.CharField(max_length=255, blank=True, null=True)
+    tableschema = models.TextField(blank=True, null=True)
+    tablename = models.TextField(blank=True, null=True)
+    code_column = models.TextField(blank=True, null=True)
+    time_column = models.TextField(blank=True, null=True)
 
     @property
     def catalog_type(self):
@@ -192,13 +192,13 @@ class StatisticalTree(GeoTreeModel):
 
 class CatalogLayer(CatalogModel):
     group = models.ForeignKey('LayerGroup', default=lambda:LayerGroup.objects.get(pk=1))
-    geom_column = models.TextField(null=True)
-    ui_qtip = models.CharField(max_length=255, null=True)
+    geom_column = models.TextField(null=True, blank=True)
+    ui_qtip = models.CharField(max_length=255, null=True, blank=True)
     gs_name = models.CharField(max_length=255,
                                verbose_name=_(u"Geoserver layer name"))
-    gs_workspace = models.CharField(max_length=255, null=True)
+    gs_workspace = models.CharField(max_length=255, null=True, blank=True)
     gs_url = models.CharField(max_length=255)
-    gs_legend_url = models.CharField(max_length=255, null=True)
+    gs_legend_url = models.CharField(max_length=255, null=True, blank=True)
 
     def import_elements_from(self, name_column, parent_column, elements_rank):
         if self.tablename is None or self.tablename == "":

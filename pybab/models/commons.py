@@ -58,8 +58,11 @@ class GeoTreeError(DatabaseError):
         return error
 
 class GeoTreeModel(models.Model):
-
     def save(self, *args, **kwargs):
+        for field in self._meta.fields:
+            if isinstance(field, (models.CharField, models.TextField)):
+                if getattr(self, field.name) == u'':
+                    setattr(self, field.name, None)
         try:
             super(GeoTreeModel, self).save(*args, **kwargs)
         except DatabaseError as dberr:
