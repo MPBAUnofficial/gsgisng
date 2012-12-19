@@ -5,6 +5,7 @@ from .tree import Element
 from .commons import GeoTreeModel, GeoTreeError, pg_run
 from ..commons import dict_join
 from ..managers import GroupModelManager
+import os
 
 # ===========================================================================
 # Utilities
@@ -84,6 +85,13 @@ class GroupModel(GeoTreeModel):
     def children(self):
         return type(self).objects.filter(child_tree__parent_group=self).exclude(
                 pk=GroupModel.ROOT_ID)
+
+    @property
+    def path(self):
+        if self.is_root:
+            return u"/"
+        else:
+            return os.path.join(self.parent.path,self.name)
 
     def to_dict(self):
         return {'id':self.id,
