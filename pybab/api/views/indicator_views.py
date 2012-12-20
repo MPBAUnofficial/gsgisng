@@ -2,8 +2,10 @@ from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.utils.translation import ugettext as _
 from pybab.models import CatalogIndicator, IndicatorGroup
 from tojson import render_to_json
+
 from .commons import login_required_json_default, get_subtree_for
 from ..forms import UserIndicatorLinkForm
+from ..api_settings import alter_id
 
 
 @login_required_json_default
@@ -11,8 +13,7 @@ from ..forms import UserIndicatorLinkForm
 def catalog_indicator(request, index=0):
     user = request.user
     if request.method == 'GET':
-        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator,
-                use_checked=True)
+        return get_subtree_for(user, int(index), IndicatorGroup, CatalogIndicator, extra_data=(alter_id,))
     elif request.method == 'POST':
         indicator_form = UserIndicatorLinkForm(request.POST)
     

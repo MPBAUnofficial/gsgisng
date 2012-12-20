@@ -1,7 +1,7 @@
 from django.conf import settings
 from psycopg2 import DatabaseError
 from django.db import connection, transaction
-from pybab.api import layer_settings
+from pybab.api import api_settings
 import shutil, tempfile
 import zipfile
 import urllib2
@@ -52,18 +52,18 @@ def _upload2pg(dir, schema, epsg_code):
 def _toGeoserver(layer_name,admin):
     """Tries to index the shapefile in geoserver. If something went wrong
     it returns the problem, returns True otherwise"""
-    geoserver_url = layer_settings.GEOSERVER_URL
-    username = layer_settings.GEOSERVER_USER
-    password = layer_settings.GEOSERVER_PASSWORD
+    geoserver_url = api_settings.GEOSERVER_URL
+    username = api_settings.GEOSERVER_USER
+    password = api_settings.GEOSERVER_PASSWORD
     p2g = Pg2Geoserver(geoserver_url,username,password)
     if admin:
-        workspace = layer_settings.WORKSPACE_ADMIN_UPLOADS
-        datastore = layer_settings.DATASTORE_ADMIN_UPLOADS
-        schema = layer_settings.SCHEMA_ADMIN_UPLOADS
+        workspace = api_settings.WORKSPACE_ADMIN_UPLOADS
+        datastore = api_settings.DATASTORE_ADMIN_UPLOADS
+        schema = api_settings.SCHEMA_ADMIN_UPLOADS
     else:
-        workspace = layer_settings.WORKSPACE_USER_UPLOADS
-        datastore = layer_settings.DATASTORE_USER_UPLOADS
-        schema = layer_settings.SCHEMA_USER_UPLOADS
+        workspace = api_settings.WORKSPACE_USER_UPLOADS
+        datastore = api_settings.DATASTORE_USER_UPLOADS
+        schema = api_settings.SCHEMA_USER_UPLOADS
     try:
         p2g.create_layer(workspace=workspace,
                          datastore=datastore,
@@ -113,9 +113,9 @@ $BODY$
 
 def _remove_layer_geoserver(layer):
     #remove layer from geoserver
-    geoserver_url = layer_settings.GEOSERVER_URL
-    username = layer_settings.GEOSERVER_USER
-    password = layer_settings.GEOSERVER_PASSWORD
+    geoserver_url = api_settings.GEOSERVER_URL
+    username = api_settings.GEOSERVER_USER
+    password = api_settings.GEOSERVER_PASSWORD
     p2g = Pg2Geoserver(geoserver_url,username,password)
     try:
         p2g.delete_layer(layer_name=layer.gs_name)

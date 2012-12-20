@@ -1,4 +1,4 @@
-from pybab.api import layer_settings
+from pybab.api import api_settings
 from django.conf import settings
 from pg2geoserver import Pg2Geoserver
 import urllib2
@@ -17,9 +17,9 @@ class DatastoreCreationFailed(Exception):
 
 def create_ws_ds(workspace,datastore,schema):
     """Create the workspace and the datastore needed in the geoserver"""
-    geoserver_url = layer_settings.GEOSERVER_URL
-    username = layer_settings.GEOSERVER_USER
-    password = layer_settings.GEOSERVER_PASSWORD
+    geoserver_url = api_settings.GEOSERVER_URL
+    username = api_settings.GEOSERVER_USER
+    password = api_settings.GEOSERVER_PASSWORD
     p2g = Pg2Geoserver(geoserver_url,username,password)
 
     db_conf = settings.DATABASES['default']

@@ -8,7 +8,7 @@ from tojson import render_to_json
 from pybab.commons import dict_join
 
 from .commons import login_required_json_default
-from ..layer_settings import MAX_STYLE_UPLOADS
+from ..api_settings import MAX_STYLE_UPLOADS
 from ..models import UserStyle
 
 from ..forms import UserStyleForm

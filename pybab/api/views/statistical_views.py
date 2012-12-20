@@ -6,13 +6,14 @@ from pybab.models import CatalogStatistical, StatisticalGroup
 
 from .commons import login_required_json_default, get_subtree_for
 from ..forms import UserStatisticalLinkForm
+from ..api_settings import alter_id
 
 @login_required_json_default
 @render_to_json()
 def catalog_statistical(request, index=0):
     user = request.user
     if request.method == 'GET':
-        return get_subtree_for(user, int(index), StatisticalGroup, CatalogStatistical)
+        return get_subtree_for(user, int(index), StatisticalGroup, CatalogStatistical, (alter_id,))
     elif request.method == 'POST':
         statistical_form = UserStatisticalLinkForm(request.POST)
 

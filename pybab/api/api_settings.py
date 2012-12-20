@@ -23,4 +23,8 @@ MAX_LAYER_UPLOADS = get('MAX_LAYER_UPLOADS', 100)
 MAX_STYLE_UPLOADS = get('MAX_STYLE_UPLOADS', 20)
 
 # 100000
-MAX_LAYER_GROUPS = get('MAX_LAYER_GROUPS', 10**5)
+MAX_GROUPS = get('MAX_GROUPS', 10**5)
+
+def alter_id(instance):
+    return {'id':instance.id*MAX_GROUPS,
+            'real_id':instance.id}

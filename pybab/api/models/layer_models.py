@@ -8,14 +8,14 @@ from django.db.models.signals import pre_delete, pre_save, post_save
 from django.dispatch import receiver
 
 from pybab.models import CatalogLayer
-from pybab.api import layer_settings
+from pybab.api import api_settings
 from pybab.api.layer_lib.pg2geoserver import Pg2Geoserver
 from pybab.api.layer_lib import shape_utils
 
 def _instantiate_pg2geoserver():
-    geoserver_url = layer_settings.GEOSERVER_URL
-    username = layer_settings.GEOSERVER_USER
-    password = layer_settings.GEOSERVER_PASSWORD
+    geoserver_url = api_settings.GEOSERVER_URL
+    username = api_settings.GEOSERVER_USER
+    password = api_settings.GEOSERVER_PASSWORD
     return Pg2Geoserver(geoserver_url,username,password)
 
 class UserStyle(models.Model):

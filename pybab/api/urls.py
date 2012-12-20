@@ -21,4 +21,4 @@ urlpatterns = patterns('pybab.api',
 from django.conf import settings
 if getattr(settings, 'DEBUG', False):
     urlpatterns += patterns('',
-                            url(r'layer/form/', 'pybab.api.views.new_layer_views.layer_form'))
+                            url(r'layer/form/', 'pybab.api.views.layer_views.layer_form'))

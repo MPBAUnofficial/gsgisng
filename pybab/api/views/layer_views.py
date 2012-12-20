@@ -1,123 +1,88 @@
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
-from django.http import HttpResponseNotFound
-from django.shortcuts import render
-from django.views.decorators.http import require_POST
-from django.db import models
+from django.http import HttpResponseForbidden, \
+        HttpResponseBadRequest, HttpResponseNotFound
 from django.utils.translation import ugettext as _
-from pybab.api import layer_settings
-from pybab.models import CatalogLayer
-from pybab.api.forms import ShapeForm, UserStyleForm
-from pybab.api.models import UserLayer, UserStyle
-from tojson import render_to_json, login_required_json
 
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-@require_POST
-def upload_layer(request):
-    """Returns a json with the result of the request,
-    if it failed the error is reported"""
+from tojson import render_to_json
+from pybab.models import CatalogLayer, LayerGroup
+
+from .commons import login_required_json_default, get_subtree_for
+from ..forms import ShapeForm
+from ..api_settings import MAX_LAYER_UPLOADS, MAX_GROUPS, alter_id
+
+from django.views.decorators.csrf import csrf_exempt
+#TODO: remove exempt
+@csrf_exempt
+@login_required_json_default
+@render_to_json(mimetype='text/html')
+def catalog_layer(request, index=0):
     user = request.user
-    if len(user.userlayer_set.all())>layer_settings.MAX_LAYER_UPLOADS:
-        return {'success': False,
-                'message': _(u"You have too many layers uploaded, \
-                              delete some of them.")
-                },{'cls': HttpResponseForbidden}
-    form = ShapeForm(
-        request.POST,
-        request.FILES,
-        user=user,)
-    if form.is_valid():
-        catalogLayer = form.save()
+    index = int(index)
 
-        return {'success': True}
+    if request.method == 'GET':
+        def get_style(instance):
+            ret_dict = {}
+            if instance.related_user_set.exists():
+                #unique force this to be only one
+                ret_dict['style'] = instance.related_user_set.all()[0].style.name
+            return ret_dict
+
+        return get_subtree_for(user, index, LayerGroup, CatalogLayer,
+                extra_data=(get_style, alter_id, {'checked':False}))
+    elif request.method == 'POST':
+        return _upload_layer(request, user)
+    elif request.method == 'DELETE':
+        return _delete_layer(user, index)
     else:
-        return {'success': False,
-                'errors': form.errors}, {'cls': HttpResponseBadRequest}
+        error_msg = u"request type \"{req_type}\"is not supported".format(
+                req_type=request.method)
+        return {'success' : False,
+                'message' : _(error_msg)}, {'cls':HttpResponseForbidden}
 
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-def delete_layer(request, pk):
-    try:
-        layer = UserLayer.objects.get(pk=pk).layer
-    except UserLayer.DoesNotExist:
-        return ({'success': False,
-                 'message': 'Layer {0} does not exist'.format(pk)},
-                {'cls': HttpResponseNotFound})
-    #notes that this will delete also the user layer as a consequence of the
-    #CASCADE trigger
-    layer.delete()
-    return {'success': True}
-
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-def list_layers(request):
-    """Returns a json where layers is the list of the user layers"""
-    user = request.user
-    layers = [layer.as_dict() for layer in user.userlayer_set.all()]
-    return {'success': True,
-            'layers' : layers}
-
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-@require_POST
-def upload_style(request):
-    """Returns a json with the result of the request,
-    if it failed the error is reported"""
-    user = request.user
-    if len(user.userstyle_set.all())>layer_settings.MAX_STYLE_UPLOADS:
-        return {'success': False,
-                'errors': _(u"You have too many styles uploaded, \
-                              delete some of them.")
-                }, {'cls': HttpResponseForbidden}
-    form = UserStyleForm(request.POST, user=request.user)
-    if form.is_valid():
-        form.save()
-        return {'success': True}
+def _upload_layer(request, user):
+    if user.userlayerlink_set.count() > MAX_LAYER_UPLOADS:
+        error_msg = u"too many layers uploaded. max number is {}".format(
+                MAX_LAYER_UPLOADS)
+        return {'success':False,
+                'message':_(error_msg)}, {'cls':HttpResponseForbidden}
+    shape_form = ShapeForm(request.POST, request.FILES, user=user)
+    if shape_form.is_valid():
+        shape_form.save()
+        return {'success':True}
     else:
-        return {'success': False,
-                'errors': form.errors}, {'cls': HttpResponseBadRequest}
+        return {'success':False,
+                'message': shape_form.errors}, {'cls':HttpResponseBadRequest}
 
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-def delete_style(request, pk):
-    try:
-        style = UserStyle.objects.get(pk=pk)
-    except UserStyle.DoesNotExist:
-        return ({'success': False,
-                 'message': 'Style {0} does not exist'.format(pk)},
-                {'cls': HttpResponseNotFound})
-    try:
-        style.delete()
-    except models.ProtectedError, e:
-        msg = ("Cannot delete the style '{0}' because "
-               "it is associate to the following layer: ").format(style.label)
-        msg += " ".join(["'"+s.layer.name+"'" for s in style.userlayer_set.all()])
-        return ({'success': False,
-                 'message': msg},
-                {'cls': HttpResponseBadRequest})
-    return {'success': True}
 
-@login_required_json({'success': False,
-                      'msg' :  _(u'Logging in is required')})
-@render_to_json()
-def list_styles(request):
-    """Returns a json where styles is the list of the user styles"""
-    user = request.user
-    styles = [style.as_dict() for style in user.userstyle_set.all()]
-    #add default styles (with user=None)
-    styles += [style.as_dict() for style in
-               UserStyle.objects.filter(user__isnull = True)]
-    return {'success': True,
-            'styles' : styles}
+def _delete_layer(user, index):
+    real_id = index / MAX_GROUPS
+    try:
+        catalog_layer = CatalogLayer.objects.get(pk=real_id)
+    except CatalogLayer.DoesNotExist:
+        error_msg = _(u"layer with id '%s' does not exist") % (real_id)
+        return {'success':False,
+                'message': error_msg}, {'cls':HttpResponseNotFound}
+
+    if not catalog_layer.related_user_set.exists():
+        error_msg = _(u"layer with id '%s' is public,"
+                      u"you can not delete it.") % (real_id)
+        return {'success':False,
+                'message': error_msg}, {'cls':HttpResponseForbidden}
+    else:
+        try:
+            catalog_layer.related_user_set.get(user=user)
+        except catalog_layer.related_user_set.DoesNotExist:
+            error_msg = _(u"layer with id '%s' does not belong"
+                          u"to the current user.") % (real_id)
+            return {'success':False,
+                    'message': error_msg}, {'cls':HttpResponseForbidden}
+        #This will also delete UserLayerLink as a result of the CASCADE trigger.
+        catalog_layer.delete()
+        return {'success':True}
 
 def layer_form(request):
     '''Displays a form for 'upload'. Only active if settings.DEBUG is true'''
+    from django.shortcuts import render
+    from pybab.api.forms import UserStyleForm
     return render(request,
                   "api/upload.html",
-                  {'shape_form': ShapeForm(), 'user_form': UserStyleForm()})
-
+                  {'shape_form': ShapeForm(user=request.user), 'user_form': UserStyleForm()})
