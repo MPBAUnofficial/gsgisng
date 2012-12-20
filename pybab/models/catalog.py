@@ -21,9 +21,6 @@ class CatalogModel(GeoTreeModel):
     remotedb = models.CharField(max_length=255, blank=True, null=True)
     remoteuser = models.CharField(max_length=255, blank=True, null=True)
     remotepass = models.CharField(max_length=255, blank=True, null=True)
-    tableschema = models.TextField(blank=True, null=True)
-    tablename = models.TextField(blank=True, null=True)
-    code_column = models.TextField(blank=True, null=True)
     time_column = models.TextField(blank=True, null=True)
 
     @property
@@ -43,9 +40,6 @@ class CatalogModel(GeoTreeModel):
                 'name':self.name,
                 'creation_time':self.creation_time.isoformat(),
                 'numcode':self.numcode,
-                'tableschema':self.tableschema,
-                'tablename':self.tableschema,
-                'code_column':self.code_column,
                 'time_column':self.time_column,
                 'has_metadata':self.generic.has_metadata}
 
@@ -121,6 +115,9 @@ class ElementCatalogLink(GeoTreeModel):
 # ===========================================================================
 
 class CatalogIndicator(CatalogModel):
+    tableschema = models.TextField(blank=True, null=True)
+    tablename = models.TextField(blank=True, null=True)
+    code_column = models.TextField(blank=True, null=True)
     group = models.ForeignKey('IndicatorGroup', default=lambda:IndicatorGroup.objects.get(pk=1))
     data_column = models.TextField() 
     ui_palette = models.CharField(max_length=255, null=True)
@@ -132,6 +129,9 @@ class CatalogIndicator(CatalogModel):
     def to_dict(self):
         dict_temp = {'data_column': self.data_column,
                      'ui_palette':self.ui_palette,
+                     'tableschema':self.tableschema,
+                     'tablename':self.tableschema,
+                     'code_column':self.code_column,
                      'ui_quartili':self.ui_quartili,
                      'gs_name':self.gs_name,
                      'gs_workspace':self.gs_workspace,
@@ -165,12 +165,20 @@ class IndicatorTree(GeoTreeModel):
 # ===========================================================================
 
 class CatalogStatistical(CatalogModel):
+    tableschema = models.TextField()
+    tablename = models.TextField()
+    code_column = models.TextField()
     group = models.ForeignKey('StatisticalGroup', default=lambda:StatisticalGroup.objects.get(pk=1))
     data_column = models.TextField() 
     
     def to_dict(self):
-        dict_temp = { 'data_column': self.data_column}
-        return dict_join(dict_temp,super(CatalogIndicator,self).to_dict())
+        dict_temp = {
+            'data_column': self.data_column,
+            'tableschema':self.tableschema,
+            'tablename':self.tableschema,
+            'code_column':self.code_column
+        }
+        return dict_join(dict_temp,super(CatalogStatistical,self).to_dict())
 
     class Meta(CatalogModel.Meta):
         db_table = u'gt_catalog_statistical'
@@ -199,6 +207,9 @@ class StatisticalTree(GeoTreeModel):
 # ===========================================================================
 
 class CatalogLayer(CatalogModel):
+    tableschema = models.TextField(blank=True, null=True)
+    tablename = models.TextField(blank=True, null=True)
+    code_column = models.TextField(blank=True, null=True)
     group = models.ForeignKey('LayerGroup', default=lambda:LayerGroup.objects.get(pk=1))
     geom_column = models.TextField(null=True, blank=True)
     ui_qtip = models.CharField(max_length=255, null=True, blank=True)
@@ -220,6 +231,9 @@ class CatalogLayer(CatalogModel):
                      'ui_qtip':self.ui_qtip,
                      'gs_name':self.gs_name,
                      'gs_workspace':self.gs_workspace,
+                     'tableschema':self.tableschema,
+                     'tablename':self.tableschema,
+                     'code_column':self.code_column,
                      'gs_url':self.gs_url,
                      'gs_legend_url':self.gs_legend_url}
 
@@ -313,20 +327,20 @@ class Meta(GeoTreeModel):
     id = models.AutoField(primary_key=True)
     gt_catalog = models.ForeignKey(Catalog, unique=True, related_name="metadata_set")
     title = models.CharField(max_length=255, null=True)
-    description = models.TextField(null=True)
-    category = models.TextField(null=True)
-    extent = models.TextField(null=True)
-    measure_unit = models.TextField(null=True)
-    author = models.TextField(null=True)
-    ref_year = models.IntegerField(null=True)
-    creation_year = models.IntegerField(null=True)
-    native_format = models.TextField(null=True)
-    genealogy = models.TextField(null=True)
-    spatial_resolution = models.TextField(null=True)
-    ref_system = models.TextField(null=True)
-    availability = models.TextField(null=True)
-    has_attributes = models.NullBooleanField(null=True)
-    source = models.TextField(null=True)
+    description = models.TextField(null=True,blank=True)
+    category = models.TextField(null=True,blank=True)
+    extent = models.TextField(null=True,blank=True)
+    measure_unit = models.TextField(null=True,blank=True)
+    author = models.TextField(null=True,blank=True)
+    ref_year = models.IntegerField(null=True,blank=True)
+    creation_year = models.IntegerField(null=True,blank=True)
+    native_format = models.TextField(null=True,blank=True)
+    genealogy = models.TextField(null=True,blank=True)
+    spatial_resolution = models.TextField(null=True,blank=True)
+    ref_system = models.TextField(null=True,blank=True)
+    availability = models.TextField(null=True,blank=True)
+    has_attributes = models.NullBooleanField(null=True,blank=True)
+    source = models.TextField(null=True,blank=True)
          
     def to_dict(self):
         return {'id':self.id,

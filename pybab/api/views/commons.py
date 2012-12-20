@@ -19,6 +19,9 @@ def get_subtree_for(user, group_index, group_class, catalog_class, extra_data=No
     """
     Given a user and a tree index, it return all the json to send to the client.
     """
+    if extra_data is None:
+        extra_data = tuple()
+
     try:
         root = group_class.objects.get(pk=group_index)
     except group_class.DoesNotExist:

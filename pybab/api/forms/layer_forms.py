@@ -96,7 +96,7 @@ class ShapeForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         kwargs["instance"].remotehost = settings.DATABASES['default']['HOST']
         kwargs["instance"].remotedb = settings.DATABASES['default']['NAME']
-        kwargs["instance"].remoteport = settings.DATABASES['default']['PORT']
+        kwargs["instance"].remoteport = int(settings.DATABASES['default']['PORT'])
         kwargs["instance"].remoteuser = settings.DATABASES['default']['USER']
         kwargs["instance"].remotepass =settings.DATABASES['default']['PASSWORD']
         if self.user:
