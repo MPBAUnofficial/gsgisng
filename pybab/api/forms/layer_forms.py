@@ -40,9 +40,11 @@ class UserStyleForm(forms.ModelForm):
 
         label = cleaned_data["label"]
         if self.user:
-            self.name = label + str(self.user.id) + str(int(time.time()))
+            self.name = label.encode('ascii', 'ignore') \
+                        + str(self.user.id) + str(int(time.time()))
         else:
-            self.name = label + "_adm_" + str(int(time.time()))
+            self.name = label.encode('ascii', 'ignore') \
+                        + "_adm_" + str(int(time.time()))
         try:
             p2g.create_style(self.name, cleaned_data["xml"])
         except urllib2.HTTPError as e:
@@ -132,9 +134,11 @@ class ShapeForm(forms.ModelForm):
 
         layer_label = self.cleaned_data["name"]
         if self.user:
-            layer_id = layer_label + str(self.user.id) + str(int(time.time()))
+            layer_id = layer_label.encode('ascii', 'ignore') \
+                       + str(self.user.id) + str(int(time.time()))
         else:
-            layer_id = layer_label + "_adm_" + str(int(time.time()))
+            layer_id = layer_label.encode('ascii', 'ignore') \
+                       + "_adm_" + str(int(time.time()))
         self.layer_id = layer_id
 
         #unzip the file

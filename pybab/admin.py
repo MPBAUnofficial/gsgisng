@@ -70,7 +70,7 @@ class StatisticalGroupAdmin(admin.ModelAdmin):
         return form
 
 def catalog_and_group(obj):
-    return ("%s <span style='margin-left: 30%%;left:0px;position:absolute;'>Path: %s</span>" % (obj, obj.group.path))
+    return (u"%s <span style='margin-left: 30%%;left:0px;position:absolute;'>Path: %s</span>" % (obj, obj.group.path))
 catalog_and_group.allow_tags = True
 catalog_and_group.short_description = "CatalogLayer"
 
