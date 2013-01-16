@@ -40,7 +40,7 @@ def catalog_layer(request, index=0):
 
 def _upload_layer(request, user):
     if user.userlayerlink_set.count() > MAX_LAYER_UPLOADS:
-        error_msg = u"too many layers uploaded. max number is {}".format(
+        error_msg = u"too many layers uploaded. max number is {0}".format(
                 MAX_LAYER_UPLOADS)
         return {'success':False,
                 'message':_(error_msg)}, {'cls':HttpResponseForbidden}

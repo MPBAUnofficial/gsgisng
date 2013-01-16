@@ -314,7 +314,7 @@ class Catalog(GeoTreeModel):
                 'time_column':self.time_column}
 
     def __unicode__(self):
-        return u"({}, {})".format(self.id, self.name)
+        return u"({0}, {1})".format(self.id, self.name)
 
     class Meta(GeoTreeModel.Meta):
         db_table = u'gt_catalog'

@@ -42,7 +42,7 @@ class UserStyle(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u"({}, {})".format(self.id, self.label)
+        return u"({0}, {1})".format(self.id, self.label)
 
     def to_dict(self):
         return {'id': self.pk,

@@ -10,13 +10,13 @@ def metadata(request, index):
     try:
         catalog = Catalog.objects.get(pk=index)
     except Catalog.DoesNotExist:
-        error_msg = u"catalog with id '{}' does not exist".format(
+        error_msg = u"catalog with id '{0}' does not exist".format(
                 index)
         return {'success':False,
                 'message':_(error_msg)}, {'cls':HttpResponseBadRequest}
    
     if not catalog.has_metadata:
-        error_msg = u"catalog with id '{}' does not have metadata".format(
+        error_msg = u"catalog with id '{0}' does not have metadata".format(
                 index)
         return {'success':False,
                 'message':_(error_msg)}, {'cls':HttpResponseBadRequest}
