@@ -25,7 +25,7 @@ class Attribute(GeoTreeModel):
             return queryset.all()
 
     def __unicode__(self):
-        return u"{}, {}".format(
+        return u"{0}, {1}".format(
                 self.timestart.isoformat(),
                 self.timeend.isoformat())
 
