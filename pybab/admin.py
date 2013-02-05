@@ -93,7 +93,7 @@ class CatalogLayerAdmin(admin.ModelAdmin):
                 parent=LayerGroup.objects.get(id=LayerGroup.ROOT_ID),
                 )
         if obj:
-            form.base_fields['group'].initial = obj.group
+            form.base_fields['group'].initial = obj.group.id
         return form
 
 class CatalogStatisticalAdmin(admin.ModelAdmin):
@@ -110,7 +110,7 @@ class CatalogStatisticalAdmin(admin.ModelAdmin):
                 parent=StatisticalGroup.objects.get(id=StatisticalGroup.ROOT_ID),
                 )
         if obj:
-            form.base_fields['group'].initial = obj.group
+            form.base_fields['group'].initial = obj.group.id
         return form
 
 class CatalogIndicatorAdmin(admin.ModelAdmin):
@@ -127,7 +127,7 @@ class CatalogIndicatorAdmin(admin.ModelAdmin):
                 parent=IndicatorGroup.objects.get(id=IndicatorGroup.ROOT_ID),
                 )
         if obj:
-            form.base_fields['group'].initial = obj.group
+            form.base_fields['group'].initial = obj.group.id
         return form
 
 admin.site.register(Element)
