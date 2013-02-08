@@ -171,7 +171,9 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'filer',
     'cmsplugin_filer_image',
-    'cmsplugin_gallery',
+    'cmsplugin_image_gallery',
+    'cmsplugin_newswithimages',
+
     'registration',
     # Page versioning
 #    'reversion',
@@ -179,6 +181,8 @@ INSTALLED_APPS = (
     'pg_fuzzysearch',
     'profiles',
     'avatar',
+
+    'raven.contrib.django'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -220,7 +224,7 @@ CMS_TEMPLATES = (
 ACCOUNT_ACTIVATION_DAYS = 7
 LOGIN_REDIRECT_URL="/"
 
-#Email
+#MAIL PRODUZIONE
 #EMAIL_HOST = 'mailhost.fbk.eu'
 #DEFAULT_FROM_EMAIL = 'registrazione@fbk.eu'
 EMAIL_HOST = 'smtp.gmail.com'
