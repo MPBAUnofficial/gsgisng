@@ -1,5 +1,5 @@
 # Django 1.4 
-django>=1.4.1
+django >=1.4.1, <1.5
 
 django-registration>=0.8
 
@@ -13,7 +13,7 @@ django-registration>=0.8
 south
 
 # CMS itself
-django-cms
+django-cms==2.3.5
 
 # CMS plugins
 easy-thumbnails >= 1.0
