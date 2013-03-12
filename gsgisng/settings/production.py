@@ -1,14 +1,16 @@
-import os
+from os.path import join as j
 from django.core.exceptions import ImproperlyConfigured
 from .base import *
 
-def get_env_variable(var_name):
-    """ Get the environment variable or return exception """
+def get_settings():
     try:
-        return os.environ[var_name]
+        with open('production_settings.json', 'r') as f:
+            s = json.read(f)
+        return s.get
     except KeyError:
-        error_msg = "Set the %s environment variable" % var_name
-        raise ImproperlyConfigured(error_msg)
+        raise ImproperlyConfigured("could not find production_settings.json")
+
+sett = get_settings()
 
 #
 # Production settings for gsgisng
@@ -20,32 +22,30 @@ TEMPLATE_DEBUG=False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'NAME': sett('db_name'),
+        'USER': sett('db_user'),
+        'PASSWORD': sett('db_password'),
+        'HOST': sett('db_host'),
+        'PORT': sett('db_port'),
     }
 }
 
-#TODO: put STATICFILE_DIRS here
-STATICFILE_DIRS = ()
+STATIC_ROOT = j(SITE_ROOT, '..', '..', 'static')
+MEDIA_ROOT = j(SITE_ROOT, '..', '..', 'media')
 
-#TODO: same for TEMPLATE_DIRS
-TEMPLATE_DIRS = ()
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-SECRET_KEY = get_env_variable('SECRET_KEY')
+SECRET_KEY = sett('secret_key')
 
 INSTALLED_APPS = INSTALLED_APP + (
     'raven.contrib.django_compat'
 )
 
 RAVEN_CONFIG = {
-    'dsn': '',
+    'dsn': sett('sentry_dsn'),
 }
 
 # Mail settings
