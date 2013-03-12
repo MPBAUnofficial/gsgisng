@@ -94,7 +94,8 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.toolbar.ToolbarMiddleware',
 )
 
-ROOT_URLCONF = 'gsgisng.urls'
+
+#ROOT_URLCONF = 'gsgisng.urls'
 
 #TODO: investigate multiple wsgi applications for development and production
 WSGI_APPLICATION = 'gsgisng.wsgi.application'

@@ -1,5 +1,7 @@
 from .base import *
 
+ROOT_URLCONF = 'gsgisng.urls.development'
+
 STATIC_ROOT = PROJECT_DIR.child('static')
 MEDIA_ROOT = PROJECT_DIR.child('media')
 

@@ -32,8 +32,7 @@ DATABASES = {
 STATIC_ROOT = PROJECT_DIR.ancestor(2).child('static')
 MEDIA_ROOT = PROJECT_DIR.ancestor(2).child('media')
 
-
-
+ROOT_URLCONF = 'gsgisng.urls.production'
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
