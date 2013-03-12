@@ -46,7 +46,9 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = ()
+STATICFILES_DIRS = (
+    PROJECT_DIR.child('gsgisng').child('static'),
+)
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -74,6 +76,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'gsgisng.context_processors.home_page_id',
 )
 
+FIXTURE_DIRS = (
+    PROJECT_DIR.child('gsgisng').child('fixtures'),
+)
+
 THUMBNAIL_PROCESSORS = (
     'easy_thumbnails.processors.colorspace',
     'easy_thumbnails.processors.autocrop',
@@ -93,9 +99,6 @@ MIDDLEWARE_CLASSES = (
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
 )
-
-
-#ROOT_URLCONF = 'gsgisng.urls'
 
 #TODO: investigate multiple wsgi applications for development and production
 WSGI_APPLICATION = 'gsgisng.wsgi.application'
