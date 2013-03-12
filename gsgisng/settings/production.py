@@ -1,4 +1,3 @@
-from os.path import join as j
 from django.core.exceptions import ImproperlyConfigured
 from .base import *
 
@@ -30,8 +29,10 @@ DATABASES = {
     }
 }
 
-STATIC_ROOT = j(SITE_ROOT, '..', '..', 'static')
-MEDIA_ROOT = j(SITE_ROOT, '..', '..', 'media')
+STATIC_ROOT = PROJECT_DIR.ancestor(2).child('static')
+MEDIA_ROOT = PROJECT_DIR.ancestor(2).child('media')
+
+
 
 
 MIDDLEWARE_CLASSES = MIDDLEWARE_CLASSES + (

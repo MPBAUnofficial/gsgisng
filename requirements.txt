@@ -1,7 +1,9 @@
+unipath
+
 # Django 1.4 
 django >=1.4.1, <1.5
 
-django-registration>=0.8
+django-registration>=0.8, <0.9
 
 # C extensions
 # please consider installing those sistem-wide with "apt-get install python-imaging python-lxml"
@@ -25,4 +27,3 @@ easy-thumbnails >= 1.0
 
 # Raven
 raven
-

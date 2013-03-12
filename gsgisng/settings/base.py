@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
-import os
+# -*- coding: utf-8 -*-import os
+from unipath import Path
 
 gettext = lambda s:s
 
-PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+PROJECT_DIR = Path(__file__).ancestor(3)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -59,7 +59,9 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
-TEMPLATE_DIRS = ()
+TEMPLATE_DIRS = (
+    PROJECT_DIR.child('gsgisng').child('templates'),
+)
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',

@@ -1,5 +1,8 @@
 from .base import *
 
+STATIC_ROOT = PROJECT_DIR.child('static')
+MEDIA_ROOT = PROJECT_DIR.child('media')
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
