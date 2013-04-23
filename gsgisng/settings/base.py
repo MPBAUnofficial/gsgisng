@@ -58,7 +58,7 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_DIRS = (
@@ -128,7 +128,7 @@ INSTALLED_APPS = (
 
     'registration',
 
-    #TODO: refactor into webgis module
+    #TODO: refactor into gswebgis module
     'pg_fuzzysearch',
     'profiles',
     'avatar',

@@ -12,6 +12,14 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'gsgisng@gmail.com'
 EMAIL_HOST_PASSWORD = 'ciaociaociao'
 
+INSTALLED_APPS = INSTALLED_APPS + (
+    'pybab',
+    'pybab.api',
+    'pyhive.extra.django',
+    'gswebgis.setup',
+    'plrutils',
+)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,

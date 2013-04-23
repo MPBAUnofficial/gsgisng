@@ -23,6 +23,9 @@ urlpatterns = patterns('',
         name='registration_register'),
     url(r'^accounts/', include('registration.backends.default.urls')),
     url(r'^avatar/', include('avatar.urls')),
+
+    url(r'^api/', include('pybab.api.urls')),
+
     # Django cms
     url(r'^', include('cms.urls')),
 )

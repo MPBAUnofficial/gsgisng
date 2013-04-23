@@ -19,11 +19,11 @@ django-cms==2.3.5
 
 # CMS plugins
 easy-thumbnails >= 1.0
--e git+http://github.com/stefanfoulis/django-filer.git@develop#egg=filer
--e git+http://github.com/stefanfoulis/cmsplugin-filer.git@develop#egg=cmsplugin-filer
--e git+http://github.com/MPBAUnofficial/cmsplugin_image_gallery.git#egg=cmsplugin-image-gallery
--e git+http://github.com/MPBAUnofficial/cmsplugin_newswithimages.git#egg=cmsplugin_newswithimages
--e git+http://github.com/MPBAUnofficial/cmsplugin_contacts.git#egg=cmsplugin_contacts
-
+git+http://github.com/stefanfoulis/django-filer.git@develop#egg=filer
+git+http://github.com/stefanfoulis/cmsplugin-filer.git@develop#egg=cmsplugin-filer
+git+http://github.com/MPBAUnofficial/cmsplugin_image_gallery.git#egg=cmsplugin-image-gallery
+git+http://github.com/MPBAUnofficial/cmsplugin_newswithimages.git#egg=cmsplugin_newswithimages
+git+http://github.com/MPBAUnofficial/cmsplugin_contacts.git#egg=cmsplugin_contacts
+git+http://github.com/MPBAUnofficial/pybab.git@develop#egg=pybab
 # Raven
 raven
